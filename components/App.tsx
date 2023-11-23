@@ -1,38 +1,15 @@
 'use client'
 
-import { useState, useEffect, createRef } from 'react'
-import MathfieldElement from '../types/mathlive/mathfield-element'
+import { ComputeEngine } from '@cortex-js/compute-engine'
+import { MathField } from './MathField'
+import { parse } from '../lib/algebra/parseFromJson'
+import { useState } from 'react'
 
+type Result = 'empty' | 'error' | 'ok'
 export function App() {
-  const [value, setValue] = useState('\\sqrt{x}')
+  const ce = new ComputeEngine()
 
-  // Customize the mathfield when it is mounted
-  const mf = createRef<MathfieldElement>()
-  useEffect(() => {
-    if (mf.current) {
-      // Read more about customizing the mathfield: https://cortexjs.io/mathlive/guides/customizing/
-      mf.current.smartFence = false
-      mf.current.menuItems = []
-
-      // This could be an `onInput` handler, but this is an alternative
-      mf.current.addEventListener('input', (evt) => {
-        // When the return key is pressed, play a sound
-        if ((evt as InputEvent).inputType === 'insertLineBreak') {
-          // The mathfield is available as `evt.target`
-          // The mathfield can be controlled with `executeCommand`
-          // Read more: https://cortexjs.io/mathlive/guides/commands/
-          ;(evt.target as MathfieldElement).executeCommand('plonk')
-        }
-      })
-    }
-  }, [mf])
-
-  // Update the mathfield when the value changes
-  useEffect(() => {
-    if (mf.current) {
-      mf.current.value = value
-    }
-  }, [mf, value])
+  const [result, setResult] = useState<Result>('empty')
 
   return (
     <div className="h-full flex flex-col">
@@ -41,21 +18,64 @@ export function App() {
           <h1 className="text-xl text-bold my-2 ml-3">TERMinator</h1>
         </div>
         <div className="mr-3">
-          <a href="#" className="text-blue-600 hover:text-blue-700 underline">
+          <a
+            href="#"
+            className="text-gray-700 hover:text-black underline hidden"
+          >
             eigene Aufgabe erstellen
           </a>
         </div>
       </div>
-      <div className="grow shrink text-center">
-        Vereinfache diesen Term, achte auf eine sauere fortlaufende Rechnung
-        <div className="mt-4">
-          <math-field
-            ref={mf}
-            onInput={(evt) => setValue((evt.target as MathfieldElement).value)}
-          >
-            {value}
-          </math-field>
+      <div className="grow shrink overflow-auto">
+        <div className="mx-auto max-w-[600px] mt-7 px-4 mb-20">
+          <p className="mb-3 text-xl mt-20">
+            Berechne den Term in fortlaufender Rechnung. Beachte die Reihenfolge
+            der Rechenoperationen.
+          </p>
+          <p className="text-3xl my-6">
+            <MathField readonly value="34 + 33 \cdot 2 + 345" />
+          </p>
+          <div className="mt-4 flex w-full flex-row items-baseline">
+            <div className="text-3xl">=</div>
+            <div className="grow ml-3">
+              <div className="border-2 rounded text-3xl">
+                <MathField
+                  onChange={(latex) => {
+                    try {
+                      const json = ce.parse(latex, { canonical: false }).json
+                      const algebraNode = parse(json)
+                      console.log(json, algebraNode)
+                      if (algebraNode.type == 'null') {
+                        setResult('empty')
+                        return
+                      }
+                      setResult('ok')
+                    } catch (e) {
+                      setResult('error')
+                    }
+                  }}
+                />
+              </div>
+              <div className="mt-2 ml-1.5">
+                {result == 'empty' ? (
+                  <span className="text-blue-500 italic">
+                    Warte auf deine Eingabe
+                  </span>
+                ) : result == 'error' ? (
+                  <span className="text-red-500">
+                    Bitte Eingabe vervollständigen
+                  </span>
+                ) : result == 'ok' ? (
+                  'OK, TODO'
+                ) : (
+                  ''
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div className="mt-4 text-3xl"></div>
       </div>
     </div>
   )

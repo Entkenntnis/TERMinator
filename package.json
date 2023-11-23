@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@cortex-js/compute-engine": "^0.22.0",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "clsx": "^2.0.0",
     "immer": "^10.0.0",
