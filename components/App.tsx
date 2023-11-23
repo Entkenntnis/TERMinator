@@ -12,6 +12,7 @@ export function App() {
     if (mf.current) {
       // Read more about customizing the mathfield: https://cortexjs.io/mathlive/guides/customizing/
       mf.current.smartFence = false
+      mf.current.menuItems = []
 
       // This could be an `onInput` handler, but this is an alternative
       mf.current.addEventListener('input', (evt) => {
@@ -45,9 +46,9 @@ export function App() {
           </a>
         </div>
       </div>
-      <div className="grow shrink">
+      <div className="grow shrink text-center">
         Vereinfache diesen Term, achte auf eine sauere fortlaufende Rechnung
-        <div>
+        <div className="mt-4">
           <math-field
             ref={mf}
             onInput={(evt) => setValue((evt.target as MathfieldElement).value)}
@@ -56,7 +57,6 @@ export function App() {
           </math-field>
         </div>
       </div>
-      <div className="grow-0 h-32 bg-blue-500">Keyboard-Area</div>
     </div>
   )
 }

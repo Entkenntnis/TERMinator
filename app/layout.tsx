@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 
 import 'tailwindcss/tailwind.css'
 import './faicon.css'
+import './mathlive.css'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
@@ -19,7 +20,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" className="h-full">
-      <Script src="/mathlive/mathlive.min.js"></Script>
+      <head>
+        <Script
+          src="/mathlive/mathlive.min.js"
+          strategy="beforeInteractive"
+        ></Script>
+      </head>
       <body className="h-full">{children}</body>
     </html>
   )
