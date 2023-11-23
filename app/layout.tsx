@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 
 import 'tailwindcss/tailwind.css'
 import './faicon.css'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'TERMinator',
@@ -18,6 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" className="h-full">
+      <Script src="/mathlive/mathlive.min.js"></Script>
       <body className="h-full">{children}</body>
     </html>
   )
