@@ -28,7 +28,7 @@ export function App() {
       </div>
       <div className="grow shrink overflow-auto">
         <div className="mx-auto max-w-[600px] mt-7 px-4 mb-20">
-          <p className="mb-3 text-xl mt-20">
+          <p className="mb-3 text-xl mt-8">
             Berechne den Term in fortlaufender Rechnung. Beachte die Reihenfolge
             der Rechenoperationen.
           </p>
@@ -43,8 +43,9 @@ export function App() {
                   onChange={(latex) => {
                     try {
                       const json = ce.parse(latex, { canonical: false }).json
+                      console.log(json)
                       const algebraNode = parse(json)
-                      console.log(json, algebraNode)
+                      console.log(algebraNode)
                       if (algebraNode.type == 'null') {
                         setResult('empty')
                         return
@@ -59,11 +60,11 @@ export function App() {
               <div className="mt-2 ml-1.5">
                 {result == 'empty' ? (
                   <span className="text-blue-500 italic">
-                    Warte auf deine Eingabe
+                    Gib deinen Rechenweg ein
                   </span>
                 ) : result == 'error' ? (
-                  <span className="text-red-500">
-                    Bitte Eingabe vervollständigen
+                  <span className="text-orange-500">
+                    Eingabe unvollständig oder fehlerhaft
                   </span>
                 ) : result == 'ok' ? (
                   'OK, TODO'

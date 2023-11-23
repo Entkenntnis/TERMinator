@@ -14,24 +14,30 @@ export function MathField(props: MathFieldProps) {
   const mf = createRef<MathfieldElement>()
   useEffect(() => {
     if (mf.current) {
-      // Read more about customizing the mathfield: https://cortexjs.io/mathlive/guides/customizing/
-      mf.current.smartFence = false
       mf.current.menuItems = []
-      mf.current.inlineShortcuts = { '*': '\\cdot' }
-      mf.current.macros = {}
-      mf.current.scriptDepth = 0
-      console.log(mf.current.keybindings)
-      mf.current.keybindings = [
-        ...mf.current.keybindings,
-        { key: ':', command: ['insert', '\\div'] },
-        { key: '[NumpadDivide]', command: ['insert', '\\div'] },
-        { key: '/', command: ['insert', '\\div'] },
-      ]
-      window.MathfieldElement.decimalSeparator = ','
       if (props.readonly) {
         mf.current.readOnly = true
       } else {
         // only run on mount
+        // Read more about customizing the mathfield: https://cortexjs.io/mathlive/guides/customizing/
+        mf.current.smartFence = false
+        mf.current.inlineShortcuts = { '*': '\\cdot' }
+        mf.current.macros = {}
+        mf.current.scriptDepth = 0
+        mf.current.mathVirtualKeyboardPolicy = 'manual'
+        mf.current.addEventListener('focusin', () => {
+          window.mathVirtualKeyboard.show()
+        })
+        mf.current.addEventListener('focusout', () => {
+          window.mathVirtualKeyboard.hide()
+        })
+        mf.current.keybindings = [
+          ...mf.current.keybindings,
+          { key: ':', command: ['insert', '\\div'] },
+          { key: '[NumpadDivide]', command: ['insert', '\\div'] },
+          { key: '/', command: ['insert', '\\div'] },
+        ]
+        window.MathfieldElement.decimalSeparator = ','
         mf.current.focus()
         window.mathVirtualKeyboard.layouts = {
           displayEditToolbar: false,
@@ -46,7 +52,10 @@ export function MathField(props: MathFieldProps) {
               ')',
               '[left]',
               '[right]',
-              { label: '[backspace]', width: 1.5 },
+              {
+                label: '[backspace]',
+                width: 1.5,
+              },
             ],
             ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
             [],
