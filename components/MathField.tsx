@@ -66,13 +66,6 @@ export function MathField(props: MathFieldProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Update the mathfield when the value changes
-  useEffect(() => {
-    if (mf.current) {
-      mf.current.value = value
-    }
-  }, [value, mf])
-
   return (
     <math-field
       style={{ display: 'block' }}

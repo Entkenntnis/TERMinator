@@ -1,39 +1,37 @@
 export interface NatNode {
   type: 'nat'
   value: number
+  children: []
 }
 
 export interface AddNode {
   type: 'add'
-  left: AlgebraNode
-  right: AlgebraNode
+  children: [AlgebraNode, AlgebraNode]
 }
 
 export interface SubtractNode {
   type: 'subtract'
-  left: AlgebraNode
-  right: AlgebraNode
+  children: [AlgebraNode, AlgebraNode]
 }
 
 export interface MultiplyNode {
   type: 'multiply'
-  left: AlgebraNode
-  right: AlgebraNode
+  children: [AlgebraNode, AlgebraNode]
 }
 
 export interface DivideNode {
   type: 'divide'
-  left: AlgebraNode
-  right: AlgebraNode
+  children: [AlgebraNode, AlgebraNode]
 }
 
 export interface NegateNode {
   type: 'negate'
-  child: AlgebraNode
+  children: [AlgebraNode]
 }
 
 export interface NullNode {
   type: 'null'
+  children: []
 }
 
 export type AlgebraNode =
