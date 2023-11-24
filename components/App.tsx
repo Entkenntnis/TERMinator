@@ -23,7 +23,9 @@ export function App() {
   const ce = new ComputeEngine()
 
   const [list, setList] = useState<string[]>([
-    '263 - 123 + 47 + 190 - 57 - 20 ',
+    //'263 - 123 + 47 + 190 - 57 - 20',
+    '191 - (2 \\cdot (29 + 6)-50)\\cdot 8',
+    //'((5 \\cdot 6 + 14) \\div 4 + 289 - (38+29))+52',
   ])
 
   const [result, setResult] = useState<Result>('loading')
@@ -57,12 +59,27 @@ export function App() {
           <h1 className="text-xl text-bold my-2 ml-3">TERMinator</h1>
         </div>
         <div className="mr-3">
-          <a
-            href="#"
-            className="text-gray-700 hover:text-black underline hidden"
+          <select
+            className="ml-3"
+            onChange={(e) => {
+              if (e.target.value) {
+                setResult('loading')
+                console.log(e.target.value, 'change')
+                setList([e.target.value])
+              }
+            }}
           >
-            eigene Aufgabe erstellen
-          </a>
+            <option value="">Beispiel auswählen</option>
+            <option value="263 - 123 + 47 + 190 - 57 - 20">
+              263 - 123 + 47 + 190 - 57 - 20
+            </option>
+            <option value="191 - (2 \cdot (29 + 6)-50)\cdot 8">
+              191 - (2 \cdot (29 + 6)-50)\cdot 8
+            </option>
+            <option value="((5 \cdot 6 + 14) \div 4 + 289 - (38+29))+52">
+              ((5 \cdot 6 + 14) \div 4 + 289 - (38+29))+52
+            </option>
+          </select>
         </div>
       </div>
       <div className="grow shrink overflow-auto">
@@ -72,7 +89,7 @@ export function App() {
             nachvollziehbaren Rechenweg.
           </p>
           {list.map((el, i) => (
-            <p className="text-3xl my-6" key={i}>
+            <p className="text-3xl my-6" key={i + list[0]}>
               <MathField readonly value={`${i > 0 ? '=' : ''} ${el}`} />
             </p>
           ))}
@@ -204,7 +221,7 @@ export function App() {
           )}
           {['match', 'contain', 'finish'].includes(result) && (
             <div className="mt-16 text-gray-600 absolute top-0 right-3 text-xs">
-              Distanz: {currentDistance.current} / 9
+              Distanz: {currentDistance.current} / 10
             </div>
           )}
         </div>
