@@ -11,7 +11,9 @@ type Result = 'empty' | 'error' | 'match' | 'contain' | 'hm' | 'finish' | 'done'
 export function App() {
   const ce = new ComputeEngine()
 
-  const [list, setList] = useState<string[]>(['34 + 33 \\cdot 2 + 345'])
+  const [list, setList] = useState<string[]>([
+    '263 - 123 + 47 + 190 - 57 - 20 ',
+  ])
 
   const [result, setResult] = useState<Result>('empty')
 
@@ -107,6 +109,7 @@ export function App() {
                         className="px-2 py-1 rounded bg-green-200 hover:bg-green-300 ml-3 inline-block"
                         onClick={() => {
                           setList((list) => [...list, currentValue.current])
+                          setResult('empty')
                         }}
                       >
                         Zum nächsten Zwischenschritt
