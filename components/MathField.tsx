@@ -5,6 +5,7 @@ interface MathFieldProps {
   value?: string
   readonly?: boolean
   onChange?: (latex: string) => void
+  onEnter?: () => void
 }
 
 export function MathField(props: MathFieldProps) {
@@ -70,6 +71,11 @@ export function MathField(props: MathFieldProps) {
     <math-field
       style={{ display: 'block' }}
       ref={mf}
+      onKeyDownCapture={(ev) => {
+        if (ev.key == 'Enter' && props.onEnter) {
+          props.onEnter()
+        }
+      }}
       onInput={(evt) => {
         const v = (evt.target as MathfieldElement).value
         setValue(v)

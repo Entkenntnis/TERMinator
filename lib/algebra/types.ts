@@ -2,6 +2,7 @@ export interface NatNode {
   type: 'nat'
   value: number
   children: []
+  level?: number
 }
 
 export interface AddNode {
