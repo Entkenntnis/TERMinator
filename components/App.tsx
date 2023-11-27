@@ -40,7 +40,10 @@ export function App() {
   const [result, setResult] = useState<Result>('loading')
 
   const currentValue = useRef('')
-  const currentMap = useRef<ExplorationMap>({ map: {} })
+  const currentMap = useRef<ExplorationMap>({
+    map: {},
+    start: { type: 'null', children: [] },
+  })
   const currentDistance = useRef(-1)
 
   useEffect(() => {
