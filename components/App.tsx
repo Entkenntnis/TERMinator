@@ -9,6 +9,7 @@ import { ExplorationMap, explore } from '../lib/algebra/explore'
 import { replaceSubtractNegate } from '../lib/algebra/replaceSubtractNegate'
 import { FaIcon } from './FaIcon'
 import { faCircleCheck, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { evaluate } from '../lib/algebra/eval'
 
 type Result =
   | 'empty'
@@ -19,6 +20,8 @@ type Result =
   | 'finish'
   | 'done'
   | 'loading'
+  | 'toofast'
+
 export function App() {
   const ce = new ComputeEngine()
 
@@ -189,7 +192,14 @@ export function App() {
                               )
                               setResult('contain')
                             } else {
-                              setResult('hm')
+                              if (
+                                evaluate(algebraNode) ==
+                                evaluate(currentMap.current.start)
+                              ) {
+                                setResult('toofast')
+                              } else {
+                                setResult('hm')
+                              }
                             }
                           } catch (e) {
                             setResult('error')
@@ -250,6 +260,10 @@ export function App() {
                       ) : result == 'contain' ? (
                         <span className="text-green-600">
                           Sieht gut aus, weiter so!
+                        </span>
+                      ) : result == 'toofast' ? (
+                        <span className="text-blue-500">
+                          Ganz nett, aber mach es bitte langsamer
                         </span>
                       ) : result == 'hm' ? (
                         <span className="italic">

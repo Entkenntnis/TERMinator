@@ -3,6 +3,7 @@ import { AlgebraNode } from './types'
 
 export interface ExplorationMap {
   map: { [key: string]: ExplorationResult }
+  start: AlgebraNode
 }
 
 interface ExplorationResult {
@@ -15,7 +16,7 @@ export async function explore(
   iterations: number,
   cutoff: number
 ) {
-  const output: ExplorationMap = { map: {} }
+  const output: ExplorationMap = { map: {}, start }
   output.map[print(start)] = { node: start, distance: 0 }
 
   let previousMin = -1
