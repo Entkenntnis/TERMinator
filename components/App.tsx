@@ -37,6 +37,8 @@ export function App() {
     //'((5 \\cdot 6 + 14) \\div 4 + 289 - (38+29))+52',
   ])
 
+  const [isComplete, setIsComplete] = useState(false)
+
   const [result, setResult] = useState<Result>('loading')
 
   const currentValue = useRef('')
@@ -182,6 +184,13 @@ export function App() {
                               } else {
                                 setResult('match')
                               }
+                            } else if (
+                              evaluate(algebraNode) ==
+                              evaluate(currentMap.current.start)
+                            ) {
+                              currentValue.current = latex
+                              setResult('toofast')
+                              setIsComplete(algebraNode.type == 'nat')
                             } else if (keys.some((key) => key.includes(cur))) {
                               const matches = keys.filter((key) =>
                                 key.includes(cur)
@@ -195,14 +204,7 @@ export function App() {
                               )
                               setResult('contain')
                             } else {
-                              if (
-                                evaluate(algebraNode) ==
-                                evaluate(currentMap.current.start)
-                              ) {
-                                setResult('toofast')
-                              } else {
-                                setResult('hm')
-                              }
+                              setResult('hm')
                             }
                           } catch (e) {
                             setResult('error')
@@ -266,13 +268,23 @@ export function App() {
                         </span>
                       ) : result == 'toofast' ? (
                         <span className="text-blue-500">
-                          Ganz nett, aber mach es bitte langsamer
+                          Der Term ist gleichwertig, allerdings konnte der
+                          Rechenweg nicht nachvollzogen werden. Ergänze einen
+                          Zwischenschritt oder{' '}
+                          <button
+                            className="underline text-gray-700 hover:text-black"
+                            onClick={() => {
+                              setList((list) => [...list, currentValue.current])
+                              setResult(isComplete ? 'done' : 'loading')
+                            }}
+                          >
+                            machen trotzdem weiter.
+                          </button>
                         </span>
                       ) : result == 'hm' ? (
                         <span className="italic">
                           Hm, das passt noch nicht. Mögliche Gründe:
-                          Rechenfehler, zu viele Zwischenschritte übersprungen,
-                          Term noch unvollständig
+                          Rechenfehler, Term unvollständig
                         </span>
                       ) : null}
                     </div>
