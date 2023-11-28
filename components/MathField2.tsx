@@ -8,7 +8,7 @@ interface MathFieldProps {
   onEnter?: () => void
 }
 
-export function MathField(props: MathFieldProps) {
+export function MathField2(props: MathFieldProps) {
   const [value, setValue] = useState(props.value ?? '')
 
   // Customize the mathfield when it is mounted
@@ -18,15 +18,15 @@ export function MathField(props: MathFieldProps) {
       mf.current.menuItems = []
       if (props.readonly) {
         mf.current.readOnly = true
-        mf.current.registers.arraystretch = 1.3
       } else {
         // only run on mount
         // Read more about customizing the mathfield: https://cortexjs.io/mathlive/guides/customizing/
-        mf.current.smartFence = false
-        mf.current.inlineShortcuts = { '*': '\\cdot' }
-        mf.current.macros = {}
-        mf.current.scriptDepth = 0
-        mf.current.mathVirtualKeyboardPolicy = 'manual'
+        // mf.current.smartFence = false
+        mf.current.inlineShortcuts = {
+          ...mf.current.inlineShortcuts,
+          '*': '\\cdot',
+        }
+        mf.current.scriptDepth = 1
         mf.current.addEventListener('focusin', () => {
           window.mathVirtualKeyboard.show()
         })
@@ -37,32 +37,8 @@ export function MathField(props: MathFieldProps) {
           ...mf.current.keybindings,
           { key: ':', command: ['insert', '\\div'] },
           { key: '[NumpadDivide]', command: ['insert', '\\div'] },
-          { key: '/', command: ['insert', '\\div'] },
         ]
-        //window.MathfieldElement.decimalSeparator = ','
         mf.current.focus()
-        window.mathVirtualKeyboard.layouts = {
-          displayEditToolbar: false,
-          rows: [
-            [],
-            [
-              '+',
-              '-',
-              '\\cdot',
-              '\\div',
-              '(',
-              ')',
-              '[left]',
-              '[right]',
-              {
-                label: '[backspace]',
-                width: 1.5,
-              },
-            ],
-            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-            [],
-          ],
-        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

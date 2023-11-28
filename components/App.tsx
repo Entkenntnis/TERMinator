@@ -69,8 +69,11 @@ export function App() {
   return (
     <div className="h-full flex flex-col">
       <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
-        <div>
+        <div className="flex items-baseline">
           <h1 className="text-xl text-bold my-2 ml-3">TERMinator</h1>
+          <a href="/" className="ml-4 underline ">
+            zurück
+          </a>
         </div>
         <div className="mr-3">
           {edit ? (

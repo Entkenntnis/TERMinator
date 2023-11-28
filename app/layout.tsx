@@ -6,9 +6,8 @@ import './mathlive.css'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
-  title: 'TERMinator',
-  description:
-    'Löse Algebra-Aufgaben in fortlaufender Rechnung mit durchgehendem Feedback',
+  title: 'Algebra Interaktion Prototypen',
+  description: 'Interaktiv Algebra Aufgaben lösen',
 }
 
 export default function RootLayout({
@@ -19,14 +18,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="de" className="h-full">
+    <html lang="de">
       <head>
         <Script
           src="/mathlive/mathlive.min.js"
           strategy="beforeInteractive"
         ></Script>
       </head>
-      <body className="h-full">{children}</body>
+      <body>{children}</body>
     </html>
   )
 }
