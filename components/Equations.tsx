@@ -4,7 +4,11 @@ import { MathField } from './MathField'
 import { ComputeEngine } from '@cortex-js/compute-engine'
 import { useRef, useState } from 'react'
 import { FaIcon } from './FaIcon'
-import { faCircleCheck, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import {
+  faCircleCheck,
+  faPlay,
+  faRotateLeft,
+} from '@fortawesome/free-solid-svg-icons'
 import { MathField2 } from './MathField2'
 import { Expression } from '../types/mathlive/mathfield-element'
 import { Action, findActions } from '../lib/equations'
@@ -59,6 +63,96 @@ export function Equations() {
       console.log(e)
     }
   }
+  const rejectReason = useRef('')
+
+  const [showOverview, setShowOverview] = useState(true)
+
+  if (showOverview) {
+    return (
+      <div className="flex flex-col">
+        <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
+          <div className="flex items-baseline">
+            <h1 className="text-xl text-bold my-2 ml-3">Gleichungslöser</h1>
+          </div>
+          <div className="mr-3">
+            <a href="/" className="hover:underline">
+              zurück zu Algebra-Prototypen
+            </a>
+            <button
+              className="ml-8 hover:underline"
+              onClick={() => {
+                setShowOverview(false)
+                setEdit(true)
+              }}
+            >
+              eigene Aufgabe erstellen
+            </button>
+          </div>
+        </div>
+        <div className="grow shrink overflow-auto">
+          <div className="mx-auto max-w-[600px] mt-7 px-4 mb-[500px] [&>h3]:text-lg [&>h3]:font-bold">
+            <h3>Serlo 26258: Aufgaben zu linearen Gleichungen</h3>
+            {renderExample('x+1=4')}
+            {renderExample('2x=8')}
+            {renderExample('4x=3x+5')}
+            {renderExample('0x=7', 'Problem mit leerer Lösungsmenge')}
+            {renderExample('4x+4=3x+3')}
+            {renderExample('4x=3x+5')}
+            {renderExample('5x-2=x+6')}
+            {renderExample('3x=x+5', 'Bruch als Lösung nicht erkannt')}
+            {renderExample('2x=4')}
+            {renderExample('7x-9=2x+5', 'Bruch als Lösung nicht erkannt')}
+            {renderExample(
+              '\\frac{1}{12}x - 5 = 3',
+              'Umformung mit Bruch nicht möglich'
+            )}
+            {renderExample('-8x + 5 = -5', 'Bruch als Lösung nicht erkannt')}
+            {renderExample('x + 4 = 9x - (5 - x)')}
+            {renderExample(
+              '\\frac{1}{24} x = 0',
+              'Umformung mit Bruch nicht möglich'
+            )}
+            {renderExample(
+              '3(a-4)=1-\\frac15(2-a)',
+              'Vereinfachung wird nicht erkannt'
+            )}
+            {renderExample('3(4x-3)=4(3x-4)', 'Leere Lösungsmenge')}
+            {renderExample(
+              '3(4x+4)=4(3-4x)',
+              'Umformung bei x=0 nicht erkannt'
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  function renderExample(latex: string, warning?: string) {
+    return (
+      <div className="my-4 flex items-baseline justify-between">
+        <div className="text-2xl">
+          <MathField readonly key={latex} value={latex} />
+        </div>
+        <div>
+          <span className="text-sm text-yellow-600 mr-3">{warning}</span>
+          <button
+            className="px-2 py-1 bg-green-200 hover:bg-green-300 rounded"
+            onClick={() => {
+              setShowOverview(false)
+              setList([latex])
+              setMode('choose')
+              setInputState('empty')
+              setActions([])
+              setSolution('')
+            }}
+          >
+            <FaIcon icon={faPlay} className="text-sm mr-2" />
+            Starten
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   const output = `\\begin{align}${list
     .map((line, i) => {
@@ -79,16 +173,11 @@ export function Equations() {
     })
     .join('\\\\\n')}\\end{align}`
 
-  const rejectReason = useRef('')
-
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col">
       <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
         <div className="flex items-baseline">
           <h1 className="text-xl text-bold my-2 ml-3">Gleichungslöser</h1>
-          <a href="/" className="ml-4 underline ">
-            zurück
-          </a>
         </div>
         <div className="mr-3">
           {edit ? (
@@ -100,19 +189,17 @@ export function Equations() {
                 setMode('choose')
               }}
             >
-              Änderungen übernehmen
+              Aufgabe testen
             </button>
           ) : (
             <button
               className="px-2 py-1 rounded bg-pink-300 hover:bg-pink-400"
               onClick={() => {
-                setEdit(true)
-                setList((list) => [list[0]])
-                setActions([])
-                setMode('done')
+                setShowOverview(true)
+                window.mathVirtualKeyboard.hide()
               }}
             >
-              Aufgabe überarbeiten
+              Aufgabe schließen
             </button>
           )}
         </div>
