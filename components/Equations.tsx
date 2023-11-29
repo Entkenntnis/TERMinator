@@ -65,6 +65,8 @@ export function Equations() {
   }
   const rejectReason = useRef('')
 
+  const solved = useRef<Set<string>>(new Set())
+
   const [showOverview, setShowOverview] = useState(true)
 
   if (showOverview) {
@@ -72,7 +74,7 @@ export function Equations() {
       <div className="flex flex-col">
         <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
           <div className="flex items-baseline">
-            <h1 className="text-xl text-bold my-2 ml-3">Gleichungslöser</h1>
+            <h1 className="text-xl text-bold my-2 ml-3">Gleichungstool</h1>
           </div>
           <div className="mr-3">
             <a href="/" className="hover:underline">
@@ -97,7 +99,6 @@ export function Equations() {
             {renderExample('4x=3x+5')}
             {renderExample('0x=7', 'Problem mit leerer Lösungsmenge')}
             {renderExample('4x+4=3x+3')}
-            {renderExample('4x=3x+5')}
             {renderExample('5x-2=x+6')}
             {renderExample('3x=x+5', 'Bruch als Lösung nicht erkannt')}
             {renderExample('2x=4')}
@@ -116,7 +117,10 @@ export function Equations() {
               '3(a-4)=1-\\frac15(2-a)',
               'Vereinfachung wird nicht erkannt'
             )}
-            {renderExample('3(4x-3)=4(3x-4)', 'Leere Lösungsmenge')}
+            {renderExample(
+              '3(4x-3)=4(3x-4)',
+              'Problem mit leerer Lösungsmenge'
+            )}
             {renderExample(
               '3(4x+4)=4(3-4x)',
               'Umformung bei x=0 nicht erkannt'
@@ -128,27 +132,50 @@ export function Equations() {
   }
 
   function renderExample(latex: string, warning?: string) {
+    const isSolved = solved.current.has(latex)
     return (
       <div className="my-4 flex items-baseline justify-between">
-        <div className="text-2xl">
+        <div className="text-2xl flex items-baseline">
           <MathField readonly key={latex} value={latex} />
+          {isSolved && (
+            <FaIcon
+              icon={faCircleCheck}
+              className="ml-2 text-green-500 text-base"
+            />
+          )}
         </div>
         <div>
           <span className="text-sm text-yellow-600 mr-3">{warning}</span>
-          <button
-            className="px-2 py-1 bg-green-200 hover:bg-green-300 rounded"
-            onClick={() => {
-              setShowOverview(false)
-              setList([latex])
-              setMode('choose')
-              setInputState('empty')
-              setActions([])
-              setSolution('')
-            }}
-          >
-            <FaIcon icon={faPlay} className="text-sm mr-2" />
-            Starten
-          </button>
+          {isSolved ? (
+            <button
+              className="text-gray-700 hover:text-black hover:underline"
+              onClick={() => {
+                setShowOverview(false)
+                setList([latex])
+                setMode('choose')
+                setInputState('empty')
+                setActions([])
+                setSolution('')
+              }}
+            >
+              erneut starten
+            </button>
+          ) : (
+            <button
+              className="px-2 py-1 bg-green-200 hover:bg-green-300 rounded"
+              onClick={() => {
+                setShowOverview(false)
+                setList([latex])
+                setMode('choose')
+                setInputState('empty')
+                setActions([])
+                setSolution('')
+              }}
+            >
+              <FaIcon icon={faPlay} className="text-sm mr-2" />
+              Starten
+            </button>
+          )}
         </div>
       </div>
     )
@@ -177,20 +204,30 @@ export function Equations() {
     <div className="flex flex-col">
       <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
         <div className="flex items-baseline">
-          <h1 className="text-xl text-bold my-2 ml-3">Gleichungslöser</h1>
+          <h1 className="text-xl text-bold my-2 ml-3">Gleichungstool</h1>
         </div>
         <div className="mr-3">
           {edit ? (
-            <button
-              className="px-2 py-1 rounded bg-green-200 hover:bg-green-300 disabled:cursor-not-allowed"
-              disabled={mode !== 'done'}
-              onClick={() => {
-                setEdit(false)
-                setMode('choose')
-              }}
-            >
-              Aufgabe testen
-            </button>
+            <>
+              <button
+                className="mr-5 hover:underline"
+                onClick={() => {
+                  setShowOverview(true)
+                }}
+              >
+                abbrechen
+              </button>
+              <button
+                className="px-2 py-1 rounded bg-green-200 hover:bg-green-300 disabled:cursor-not-allowed"
+                disabled={mode !== 'done'}
+                onClick={() => {
+                  setEdit(false)
+                  setMode('choose')
+                }}
+              >
+                Aufgabe testen
+              </button>
+            </>
           ) : (
             <button
               className="px-2 py-1 rounded bg-pink-300 hover:bg-pink-400"
@@ -331,6 +368,7 @@ export function Equations() {
                                 setRefRight(combineRef(parts[1], op))*/
                                 setMode('done')
                                 setSolution(op.latex)
+                                solved.current.add(list[0])
                               }}
                             ></span>
                           </button>
