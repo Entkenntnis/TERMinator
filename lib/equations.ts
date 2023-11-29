@@ -6,7 +6,10 @@ export interface Action {
   latex: string
 }
 
-export function findActions(input: Expression, variableSymbol: string) {
+export function findActions(
+  input: Expression,
+  variableSymbol: string
+): Action[] {
   const ce = new ComputeEngine()
   const output: Action[] = [{ type: 'simplify', latex: '' }]
 
@@ -59,12 +62,38 @@ export function findActions(input: Expression, variableSymbol: string) {
           latex: `\\mathbb{L} = \\{ ${value} \\}`,
         })
       }
+      if (isDoneRational(input)) {
+        const value = isRational(input[1]) ? input[1] : input[2]
+        output.push({
+          type: 'solution',
+          latex: `\\mathbb{L} = \\left\\{ ${ce.box(value).latex} \\right\\}`,
+        })
+      }
+      if (typeof input[1] == 'number' && typeof input[2] == 'number') {
+        if (input[1] === input[2]) {
+          output.push({
+            type: 'solution',
+            latex: `\\mathbb{L} = \\mathbb{Q}`,
+          })
+        } else {
+          output.push({
+            type: 'solution',
+            latex: `\\mathbb{L} = \\{ \\}`,
+          })
+        }
+      }
       forInput(input[1])
       forInput(input[2])
-      return output.map((op) => {
-        op.latex = op.latex.replaceAll('.', '{,}')
-        return op
-      })
+      const existingOps = new Set<string>()
+      return output
+        .map((op) => {
+          op.latex = op.latex.replaceAll('.', '{,}')
+          const key = op.latex + '²²' + op.type
+          if (existingOps.has(key)) return null
+          existingOps.add(key)
+          return op
+        })
+        .filter((x) => x !== null) as Action[]
     }
   }
   throw new Error('invalid input')
@@ -79,6 +108,33 @@ export function findActions(input: Expression, variableSymbol: string) {
         (json[2] == variableSymbol && typeof json[1] == 'number'))
     ) {
       return true
+    }
+    return false
+  }
+
+  function isDoneRational(json: Expression) {
+    console.log('is done?', json)
+    if (
+      Array.isArray(json) &&
+      json.length == 3 &&
+      json[0] == 'Equal' &&
+      ((json[1] == variableSymbol && isRational(json[2])) ||
+        (json[2] == variableSymbol && isRational(json[1])))
+    ) {
+      return true
+    }
+    return false
+  }
+
+  function isRational(json: Expression) {
+    if (Array.isArray(json)) {
+      if (
+        json[0] == 'Rational' &&
+        typeof json[1] == 'number' &&
+        typeof json[2] == 'number'
+      ) {
+        return true
+      }
     }
     return false
   }

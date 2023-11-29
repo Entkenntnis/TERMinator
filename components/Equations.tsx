@@ -97,17 +97,17 @@ export function Equations() {
             {renderExample('x+1=4')}
             {renderExample('2x=8')}
             {renderExample('4x=3x+5')}
-            {renderExample('0x=7', 'Problem mit leerer Lösungsmenge')}
+            {renderExample('0x=7')}
             {renderExample('4x+4=3x+3')}
             {renderExample('5x-2=x+6')}
-            {renderExample('3x=x+5', 'Bruch als Lösung nicht erkannt')}
+            {renderExample('3x=x+5')}
             {renderExample('2x=4')}
-            {renderExample('7x-9=2x+5', 'Bruch als Lösung nicht erkannt')}
+            {renderExample('7x-9=2x+5')}
             {renderExample(
               '\\frac{1}{12}x - 5 = 3',
               'Umformung mit Bruch nicht möglich'
             )}
-            {renderExample('-8x + 5 = -5', 'Bruch als Lösung nicht erkannt')}
+            {renderExample('-8x + 5 = -5')}
             {renderExample('x + 4 = 9x - (5 - x)')}
             {renderExample(
               '\\frac{1}{24} x = 0',
@@ -117,14 +117,8 @@ export function Equations() {
               '3(a-4)=1-\\frac15(2-a)',
               'Vereinfachung wird nicht erkannt'
             )}
-            {renderExample(
-              '3(4x-3)=4(3x-4)',
-              'Problem mit leerer Lösungsmenge'
-            )}
-            {renderExample(
-              '3(4x+4)=4(3-4x)',
-              'Umformung bei x=0 nicht erkannt'
-            )}
+            {renderExample('3(4x-3)=4(3x-4)')}
+            {renderExample('3(4x+4)=4(3-4x)', 'Fehlende Optionen am Schluss')}
           </div>
         </div>
       </div>
