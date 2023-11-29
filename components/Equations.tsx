@@ -301,8 +301,13 @@ export function Equations() {
 
                             const parts = latex.split('=')
 
+                            if (parts.length < 2) {
+                              setInputState('error')
+                              return
+                            }
+
                             // TODO!! check if results are fine
-                            for (let i = -10; i <= 10; i++) {
+                            for (let i = -4; i <= 4; i++) {
                               ce.forget(variableSymbol)
                               ce.assign(variableSymbol, i)
 
