@@ -37,11 +37,18 @@ export function findActions(
       }
       if (t[0] == 'Multiply') {
         t.slice(1).forEach((t) => {
-          if (typeof t == 'number')
+          if (typeof t == 'number') {
             output.push({
               type: 'equiv-append',
               latex: `: ${t}`,
             })
+          }
+          if (isRational(t)) {
+            output.push({
+              type: 'equiv-append',
+              latex: `: ${ce.box(t).latex}`,
+            })
+          }
         })
       }
     }

@@ -103,16 +103,10 @@ export function Equations() {
             {renderExample('3x=x+5')}
             {renderExample('2x=4')}
             {renderExample('7x-9=2x+5')}
-            {renderExample(
-              '\\frac{1}{12}x - 5 = 3',
-              'Umformung mit Bruch nicht möglich'
-            )}
+            {renderExample('\\frac{1}{12}x - 5 = 3')}
             {renderExample('-8x + 5 = -5')}
             {renderExample('x + 4 = 9x - (5 - x)')}
-            {renderExample(
-              '\\frac{1}{24} x = 0',
-              'Umformung mit Bruch nicht möglich'
-            )}
+            {renderExample('\\frac{1}{24} x = 0')}
             {renderExample(
               '3(a-4)=1-\\frac15(2-a)',
               'Vereinfachung wird nicht erkannt'
