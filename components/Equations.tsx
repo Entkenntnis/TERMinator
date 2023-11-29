@@ -2,23 +2,12 @@
 
 import { MathField } from './MathField'
 import { ComputeEngine } from '@cortex-js/compute-engine'
-import { parse } from '../lib/algebra/parseFromJson'
-import { useEffect, useRef, useState } from 'react'
-import { print } from '../lib/algebra/print'
-import { ExplorationMap, explore } from '../lib/algebra/explore'
-import { replaceSubtractNegate } from '../lib/algebra/replaceSubtractNegate'
+import { useRef, useState } from 'react'
 import { FaIcon } from './FaIcon'
-import {
-  faArrowDownLong,
-  faCircleCheck,
-  faRotateLeft,
-  faSpinner,
-  faTimes,
-} from '@fortawesome/free-solid-svg-icons'
-import { evaluate } from '../lib/algebra/eval'
+import { faCircleCheck, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { MathField2 } from './MathField2'
-import { Action, findActions } from '../lib/algebra/findActions'
 import { Expression } from '../types/mathlive/mathfield-element'
+import { Action, findActions } from '../lib/equations'
 
 type Mode = 'done' | 'input' | 'choose'
 type InputState =
@@ -28,7 +17,6 @@ type InputState =
   | 'var-mismatch'
   | 'left-mismatch'
   | 'right-mismatch'
-  | 'last-step'
 
 export function Equations() {
   const ce = new ComputeEngine()
@@ -38,7 +26,7 @@ export function Equations() {
   }
   window.MathfieldElement.decimalSeparator = ','
   const [description, setDescription] = useState(
-    'Löse die Gleichung. Wähle in jedem Schritt eine Umformung.'
+    'Löse die Gleichung und bestimme die Lösungsmenge.'
   )
   const [edit, setEdit] = useState(false)
 
@@ -47,6 +35,8 @@ export function Equations() {
 
   const [list, setList] = useState<string[]>(['4x + 3 = 11'])
   const [actions, setActions] = useState<Action[]>([])
+
+  const [solution, setSolution] = useState('')
 
   const variableSymbol = Array.from(
     extractSymbols(safeParse(list[list.length - 1]).json).values()
@@ -63,7 +53,7 @@ export function Equations() {
     //console.log('regen choices', JSON.stringify(list))
     const json = safeParse(list[list.length - 1]).json
     try {
-      options = findActions(json)
+      options = findActions(json, variableSymbol)
       //console.log(options)
     } catch (e) {
       console.log(e)
@@ -232,6 +222,33 @@ export function Equations() {
                           </button>
                         )
                       }
+                      if (op.type == 'solution') {
+                        return (
+                          <button
+                            className="ml-4 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded relative text-2xl"
+                            key={i}
+                          >
+                            <MathField
+                              key={op.latex}
+                              readonly
+                              value={op.latex}
+                            />
+                            <span
+                              className="absolute inset-0 opacity-0"
+                              onClick={() => {
+                                /*setActions((acs) => [...acs, op])
+                                setMode('input')
+                                setInputState('empty')
+                                const parts = list[list.length - 1].split('=')
+                                setRefLeft(combineRef(parts[0], op))
+                                setRefRight(combineRef(parts[1], op))*/
+                                setMode('done')
+                                setSolution(op.latex)
+                              }}
+                            ></span>
+                          </button>
+                        )
+                      }
                     })}
                   </div>
                 </div>
@@ -308,22 +325,13 @@ export function Equations() {
                             }
 
                             currentLatex.current = latex
-                            if (isDone(parsed.json)) {
-                              setInputState('last-step')
-                            } else {
-                              setInputState('ok')
-                            }
+                            setInputState('ok')
                           } catch (e) {
                             setMode('input')
                             setInputState('error')
                           }
                         }}
                         onEnter={() => {
-                          if (inputState == 'last-step') {
-                            setList((list) => [...list, currentLatex.current])
-                            setMode('done')
-                            window.mathVirtualKeyboard.hide()
-                          }
                           if (inputState == 'ok') {
                             setList((list) => [...list, currentLatex.current])
                             setMode('choose')
@@ -359,23 +367,10 @@ export function Equations() {
                             onClick={() => {
                               setList((list) => [...list, currentLatex.current])
                               setMode('choose')
+                              window.mathVirtualKeyboard.hide()
                             }}
                           >
                             Weiter
-                          </button>
-                        </div>
-                      )}
-                      {inputState == 'last-step' && (
-                        <div className="flex justify-between items-baseline">
-                          <span className="text-green-600">Super!</span>
-                          <button
-                            className="px-2 py-1 rounded bg-green-200 hover:bg-green-300 ml-3 inline-block"
-                            onClick={() => {
-                              setList((list) => [...list, currentLatex.current])
-                              setMode('done')
-                            }}
-                          >
-                            Aufgabe abschließen
                           </button>
                         </div>
                       )}
@@ -384,12 +379,17 @@ export function Equations() {
                 </div>
               )}
               {mode == 'done' && (
-                <div className="text-green-500 ml-4 text-xl mt-6">
-                  <FaIcon
-                    icon={faCircleCheck}
-                    className="mr-3 inline-block -mb-0.5"
-                  />{' '}
-                  abgeschlossen
+                <div className="flex justify-start items-baseline">
+                  <div className="text-2xl mt-6">
+                    <MathField readonly key={solution} value={solution} />
+                  </div>
+                  <div className="text-green-500 ml-8">
+                    <FaIcon
+                      icon={faCircleCheck}
+                      className="mr-1 inline-block -mb-0.5"
+                    />{' '}
+                    Stark!
+                  </div>
                 </div>
               )}
             </>
@@ -422,20 +422,6 @@ export function Equations() {
     return `( ${latex} ) + ( ${op.latex} )`
   }
 
-  function isDone(json: Expression) {
-    console.log('is done?', json)
-    if (
-      Array.isArray(json) &&
-      json.length == 3 &&
-      json[0] == 'Equal' &&
-      ((json[1] == variableSymbol && typeof json[2] == 'number') ||
-        (json[2] == variableSymbol && typeof json[1] == 'number'))
-    ) {
-      return true
-    }
-    return false
-  }
-
   function validateInput(json: Expression): true | string {
     console.log('MathJSON:', json)
     if (Array.isArray(json) && json.length == 3 && json[0] == 'Equal') {
@@ -444,6 +430,6 @@ export function Equations() {
         return true
       }
     }
-    return 'test'
+    return 'Eingabe keine Gleichung'
   }
 }
