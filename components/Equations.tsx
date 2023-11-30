@@ -308,15 +308,17 @@ export function Equations() {
               </button>
             </>
           ) : (
-            <button
-              className="px-2 py-1 rounded bg-pink-300 hover:bg-pink-400"
-              onClick={() => {
-                setShowOverview(true)
-                window.mathVirtualKeyboard.hide()
-              }}
-            >
-              zurück
-            </button>
+            mode !== 'done' && (
+              <button
+                className="px-2 py-1 rounded bg-pink-300 hover:bg-pink-400"
+                onClick={() => {
+                  setShowOverview(true)
+                  window.mathVirtualKeyboard.hide()
+                }}
+              >
+                zurück
+              </button>
+            )
           )}
         </div>
       </div>
@@ -610,18 +612,29 @@ export function Equations() {
                 </div>
               )}
               {mode == 'done' && (
-                <div className="flex justify-start items-baseline">
-                  <div className="text-2xl mt-6">
-                    <MathField readonly key={solution} value={solution} />
-                  </div>
-                  <div className="text-green-500 ml-8">
-                    <FaIcon
-                      icon={faCircleCheck}
-                      className="mr-1 inline-block -mb-0.5"
-                    />{' '}
-                    Stark!
-                  </div>
-                </div>
+                <>
+                  <div className="flex justify-start items-baseline">
+                    <div className="text-2xl mt-6">
+                      <MathField readonly key={solution} value={solution} />
+                    </div>
+                    <div className="text-green-500 ml-8">
+                      <FaIcon
+                        icon={faCircleCheck}
+                        className="mr-1 inline-block -mb-0.5"
+                      />{' '}
+                      Stark!
+                    </div>
+                  </div>{' '}
+                  <button
+                    className="px-2 py-1 rounded bg-blue-200 hover:bg-blue-300 mt-6"
+                    onClick={() => {
+                      setShowOverview(true)
+                      window.mathVirtualKeyboard.hide()
+                    }}
+                  >
+                    weiter
+                  </button>
+                </>
               )}
             </>
           )}
