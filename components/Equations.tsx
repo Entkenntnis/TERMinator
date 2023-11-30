@@ -169,6 +169,14 @@ export function Equations() {
             {renderExample('8{,}3-1{,}2x=4{,}7+1{,}8x')}
             {renderExample('\\frac23 x + \\frac12 = \\frac32 x + \\frac56')}
             {renderExample('\\frac34x-\\frac25 = \\frac13+\\frac45 x')}
+
+            {renderExample('15+11x=2(3+x)')}
+            {renderExample('3(x+6)=4(2+x)')}
+            {renderExample('5(2-3x)+x=2(-6+4x)')}
+            {renderExample('6(4x+8)-12=-3(3-2x)')}
+            {renderExample('10-(7x-5)=2-2(x+6)')}
+            {renderExample('12-(-3x+6)=18-(9+3x)')}
+            {renderExample('2-7(2x+5)-3(2x-4)=19')}
           </div>
         </div>
       </div>
