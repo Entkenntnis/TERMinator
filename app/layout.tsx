@@ -6,8 +6,8 @@ import './mathlive.css'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
-  title: 'Algebra Interaktion Prototypen',
-  description: 'Interaktiv Algebra Aufgaben lösen',
+  title: 'Serlo Gleichungs-App',
+  description: 'Löse Gleichungen interaktiv',
 }
 
 export default function RootLayout({

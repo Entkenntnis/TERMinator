@@ -84,6 +84,18 @@ export function Equations() {
     }
   }, [showOverview])
 
+  useEffect(() => {
+    const handlePopstate = () => {
+      setShowOverview(true)
+    }
+
+    window.addEventListener('popstate', handlePopstate)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopstate)
+    }
+  }, [])
+
   if (showOverview) {
     return (
       <div className="flex flex-col">
@@ -175,6 +187,8 @@ export function Equations() {
                 onClick={() => {
                   setShowOverview(false)
                   setEdit(true)
+                  setInputState('ok')
+                  setMode('done')
                 }}
               >
                 eigene Aufgabe erstellen
@@ -210,11 +224,13 @@ export function Equations() {
                 setMode('choose')
                 setInputState('empty')
                 setActions([])
+                setEdit(false)
                 setSolution('')
                 lastScrollPosition.current =
                   window.document.scrollingElement?.scrollTop ?? -1
 
                 window.scrollTo(0, 0)
+                window.history.pushState(null, '', null)
               }}
             >
               erneut starten
@@ -228,11 +244,13 @@ export function Equations() {
                 setMode('choose')
                 setInputState('empty')
                 setActions([])
+                setEdit(false)
                 setSolution('')
                 lastScrollPosition.current =
                   window.document.scrollingElement?.scrollTop ?? -1
 
                 window.scrollTo(0, 0)
+                window.history.pushState(null, '', null)
               }}
             >
               <FaIcon icon={faPlay} className="text-sm mr-2" />
@@ -254,7 +272,7 @@ export function Equations() {
             : `&& \\vert ${actions[i].displayLatex}`
           : mode == 'done'
           ? '&& '
-          : '&& \\hspace{0.2cm} \\boxed{\\textcolor{orange}{?}}'
+          : '&& \\boxed{\\textcolor{orange}{?}}'
       }`
     })
     .join('\\\\\n')}\\end{align}`
@@ -283,9 +301,10 @@ export function Equations() {
                   setEdit(false)
                   setMode('choose')
                   setActions([])
+                  setList([list[0]])
                 }}
               >
-                Aufgabe testen
+                Starten
               </button>
             </>
           ) : (
@@ -363,7 +382,7 @@ export function Equations() {
                       if (op.type == 'simplify') {
                         return (
                           <button
-                            className="ml-4 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded mt-3"
+                            className="ml-6 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded mt-3"
                             key={i}
                             onClick={() => {
                               setActions((acs) => [...acs, op])
@@ -381,7 +400,7 @@ export function Equations() {
                       if (op.type == 'equiv-add' || op.type == 'equiv-raw') {
                         return (
                           <button
-                            className="ml-4 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-2xl mt-3"
+                            className="ml-6 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-2xl mt-3"
                             key={i}
                           >
                             <MathField
@@ -407,7 +426,7 @@ export function Equations() {
                       if (op.type == 'solution') {
                         return (
                           <button
-                            className="ml-4 px-2 py-1 bg-green-200 hover:bg-green-300 rounded relative text-2xl mt-3"
+                            className="ml-6 px-2 py-1 bg-green-200 hover:bg-green-300 rounded relative text-2xl mt-3"
                             key={i}
                           >
                             <MathField
@@ -473,6 +492,8 @@ export function Equations() {
 
                               const symbols = extractSymbols(parsed.json)
 
+                              // console.log(symbols)
+
                               // console.log(symbols, variableSymbol)
                               if (
                                 (!symbols.has(variableSymbol) &&
@@ -493,8 +514,7 @@ export function Equations() {
 
                               // TODO!! check if results are fine
                               for (let i = -4; i <= 4; i++) {
-                                if (symbols.size > 0) {
-                                  ce.forget(variableSymbol)
+                                if (variableSymbol) {
                                   ce.assign(variableSymbol, i)
                                 }
 
@@ -617,7 +637,7 @@ export function Equations() {
       if (Array.isArray(json)) {
         json.slice(1).map(runInner)
       }
-      if (typeof json == 'string') {
+      if (typeof json == 'string' && json != 'Half') {
         output.add(json)
       }
     }

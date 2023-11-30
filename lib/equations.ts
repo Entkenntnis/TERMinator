@@ -112,7 +112,7 @@ export function findActions(
         const result = parts[0] == variableSymbol ? parts[1] : parts[0]
         let resultJSON = ce.parse(result, { canonical: false }).json
         let outputValue = ''
-        if (typeof resultJSON == 'number') {
+        if (typeof resultJSON == 'number' || resultJSON === 'Half') {
           outputValue = result
         }
         if (Array.isArray(resultJSON) && isDivide(resultJSON)) {
@@ -218,6 +218,7 @@ export function findActions(
   }
 
   function isRational(json: Expression) {
+    if (json == 'Half') return true
     if (Array.isArray(json)) {
       if (
         json[0] == 'Rational' &&
