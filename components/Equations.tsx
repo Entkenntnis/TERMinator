@@ -57,7 +57,11 @@ export function Equations() {
     //console.log('regen choices', JSON.stringify(list))
     const json = safeParse(list[list.length - 1]).json
     try {
-      options = findActions(json, variableSymbol)
+      options = findActions(
+        json,
+        variableSymbol,
+        list[list.length - 1].replaceAll('{,}', '.')
+      )
       //console.log(options)
     } catch (e) {
       console.log(e)
@@ -107,9 +111,9 @@ export function Equations() {
             {renderExample('-8x + 5 = -5')}
             {renderExample('x + 4 = 9x - (5 - x)')}
             {renderExample('\\frac{1}{24} x = 0')}
-            {renderExample('3(a-4)=1-\\frac15(2-a)')}
+            {renderExample('3(a-4)=1-\\frac15(2-a)', 'HN Multiplikation?')}
             {renderExample('3(4x-3)=4(3x-4)')}
-            {renderExample('3(4x+4)=4(3-4x)', 'Fehlende Optionen am Schluss')}
+            {renderExample('3(4x+4)=4(3-4x)')}
           </div>
         </div>
       </div>
@@ -277,7 +281,7 @@ export function Equations() {
               {mode == 'choose' && (
                 <div>
                   <p className="border-t-2 pt-4 mt-6"></p>
-                  <div className="mt-4 flex justify-around">
+                  <div className="mt-4 flex justify-around flex-wrap">
                     {options.map((op, i) => {
                       if (op.type == 'simplify') {
                         return (
@@ -422,7 +426,7 @@ export function Equations() {
                                 const valueR = safeParse(termR).N()
                                   .value as number
 
-                                console.log(termL, valueL, '\n', termR, valueR)
+                                // console.log(termL, valueL, '\n', termR, valueR)
 
                                 if (Math.abs(valueL) > 0.00001) {
                                   setInputState('left-mismatch')
@@ -537,7 +541,7 @@ export function Equations() {
   }
 
   function validateInput(json: Expression): true | string {
-    console.log('MathJSON:', json)
+    // console.log('MathJSON:', json)
     if (Array.isArray(json) && json.length == 3 && json[0] == 'Equal') {
       const symbols = extractSymbols(json)
       if (symbols.size <= 1) {

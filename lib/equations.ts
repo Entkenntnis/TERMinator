@@ -9,14 +9,16 @@ export interface Action {
 
 export function findActions(
   input: Expression,
-  variableSymbol: string
+  variableSymbol: string,
+  sourceLatex: string
 ): Action[] {
   const ce = new ComputeEngine()
-  const output: Action[] = [{ type: 'simplify', latex: '' }]
+  const output: Action[] = []
 
-  console.log('actions', input)
+  //console.log('actions', input)
 
   function negateAndShowOp(t: any) {
+    if (typeof t == 'number' && t == 0) return
     const rawLatex = ce
       .box(['Negate', t])
       .latex.replaceAll('\\frac{-', '-\\frac{')
@@ -53,6 +55,11 @@ export function findActions(
             })
           }
         })
+        if (typeof t[1] == 'number' || isRational(t[1])) {
+          if (t[2] == variableSymbol && t[1] !== 0) {
+            negateAndShowOp(t)
+          }
+        }
       }
       if (t[0] == 'Negate' && t.length == 2 && t[1] == variableSymbol) {
         output.push({
@@ -72,15 +79,37 @@ export function findActions(
 
   if (Array.isArray(input)) {
     if (input[0] == 'Equal' && input.length == 3) {
-      if (isDone(input)) {
-        const value = typeof input[1] == 'number' ? input[1] : input[2]
-        output.push({
-          type: 'solution',
-          displayLatex: `\\mathbb{L} = \\{ ${value} \\}`,
-          latex: '',
-        })
+      if (isDone(input) || isDoneRational(input)) {
+        const parts = sourceLatex.trim().split('=')
+        const result = parts[0] == variableSymbol ? parts[1] : parts[0]
+        const resultJSON = ce.parse(result, { canonical: false }).json
+        let outputValue = ''
+        if (typeof resultJSON == 'number') {
+          outputValue = result
+        }
+        if (
+          Array.isArray(resultJSON) &&
+          resultJSON.length == 3 &&
+          resultJSON[0] == 'Divide' &&
+          typeof resultJSON[1] == 'number' &&
+          typeof resultJSON[2] == 'number'
+        ) {
+          const z = resultJSON[1]
+          const n = resultJSON[2]
+          if (gcd(z, n) === 1) {
+            outputValue = result
+          }
+        }
+        if (outputValue) {
+          output.push({
+            type: 'solution',
+            displayLatex: `\\mathbb{L} = \\left\\{ ${outputValue} \\right\\}`,
+            latex: '',
+          })
+        }
       }
-      if (isDoneRational(input)) {
+      /*if (isDoneRational(input)) {
+        console.log('source', sourceLatex)
         const value = isRational(input[1]) ? input[1] : input[2]
         output.push({
           type: 'solution',
@@ -89,7 +118,7 @@ export function findActions(
           } \\right\\}`,
           latex: '',
         })
-      }
+      }*/
       if (typeof input[1] == 'number' && typeof input[2] == 'number') {
         if (input[1] === input[2]) {
           output.push({
@@ -105,6 +134,7 @@ export function findActions(
           })
         }
       }
+      output.push({ type: 'simplify', latex: '' })
       forInput(input[1])
       forInput(input[2])
       const existingOps = new Set<string>()
@@ -163,4 +193,8 @@ export function findActions(
     }
     return false
   }
+}
+
+function gcd(a: number, b: number): number {
+  return b === 0 ? a : gcd(b, a % b)
 }
