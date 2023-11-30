@@ -15,7 +15,7 @@ export function findActions(
   const ce = new ComputeEngine()
   const output: Action[] = []
 
-  //console.log('actions', input)
+  console.log('actions', input)
 
   function negateAndShowOp(t: any) {
     if (typeof t == 'number' && t == 0) return
@@ -41,24 +41,52 @@ export function findActions(
       if (t[0] == 'Multiply') {
         t.slice(1).forEach((t) => {
           if (typeof t == 'number' && t != 0) {
-            output.push({
-              type: 'equiv-raw',
-              displayLatex: `: ${t}`,
-              latex: `\\div ${t}`,
-            })
+            if (t > 0) {
+              output.push({
+                type: 'equiv-raw',
+                displayLatex: `: ${t}`,
+                latex: `\\div ${t}`,
+              })
+            } else {
+              output.push({
+                type: 'equiv-raw',
+                displayLatex: `: ( ${t} )`,
+                latex: `\\div ${t}`,
+              })
+            }
           }
           if (isRational(t)) {
-            output.push({
-              type: 'equiv-raw',
-              displayLatex: `: ${ce.box(t).latex}`,
-              latex: `\\div ${ce.box(t).latex}`,
-            })
+            if (t[1] > 0) {
+              output.push({
+                type: 'equiv-raw',
+                displayLatex: `: ${ce.box(t).latex}`,
+                latex: `\\div ${ce.box(t).latex}`,
+              })
+            } else {
+              output.push({
+                type: 'equiv-raw',
+                displayLatex: `: (${ce
+                  .box(t)
+                  .latex.replaceAll('\\frac{-', '-\\frac{')})`,
+                latex: `\\div ${ce.box(t).latex}`,
+              })
+            }
           }
         })
         if (typeof t[1] == 'number' || isRational(t[1])) {
           if (t[2] == variableSymbol && t[1] !== 0) {
             negateAndShowOp(t)
           }
+        }
+      }
+      if (t[0] == 'Divide') {
+        if (typeof t[2] == 'number') {
+          const latex = `\\cdot ${t[2] > 0 ? t[2] : `(${t[2]})`}`
+          output.push({
+            type: 'equiv-raw',
+            displayLatex: latex,
+            latex,
+          })
         }
       }
       if (t[0] == 'Negate' && t.length == 2 && t[1] == variableSymbol) {
@@ -82,21 +110,27 @@ export function findActions(
       if (isDone(input) || isDoneRational(input)) {
         const parts = sourceLatex.trim().split('=')
         const result = parts[0] == variableSymbol ? parts[1] : parts[0]
-        const resultJSON = ce.parse(result, { canonical: false }).json
+        let resultJSON = ce.parse(result, { canonical: false }).json
         let outputValue = ''
         if (typeof resultJSON == 'number') {
           outputValue = result
         }
+        if (Array.isArray(resultJSON) && isDivide(resultJSON)) {
+          const z = resultJSON[1] as number
+          const n = resultJSON[2] as number
+          if (Math.abs(gcd(z, n)) === 1) {
+            outputValue = result
+          }
+        }
         if (
           Array.isArray(resultJSON) &&
-          resultJSON.length == 3 &&
-          resultJSON[0] == 'Divide' &&
-          typeof resultJSON[1] == 'number' &&
-          typeof resultJSON[2] == 'number'
+          resultJSON.length == 2 &&
+          resultJSON[0] == 'Negate' &&
+          isDivide(resultJSON[1])
         ) {
-          const z = resultJSON[1]
-          const n = resultJSON[2]
-          if (gcd(z, n) === 1) {
+          const z = (resultJSON as any)[1][1] as number
+          const n = (resultJSON as any)[1][2] as number
+          if (Math.abs(gcd(z, n)) === 1) {
             outputValue = result
           }
         }
@@ -185,6 +219,20 @@ export function findActions(
     if (Array.isArray(json)) {
       if (
         json[0] == 'Rational' &&
+        json.length == 3 &&
+        typeof json[1] == 'number' &&
+        typeof json[2] == 'number'
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+  function isDivide(json: Expression) {
+    if (Array.isArray(json)) {
+      if (
+        json[0] == 'Divide' &&
+        json.length == 3 &&
         typeof json[1] == 'number' &&
         typeof json[2] == 'number'
       ) {

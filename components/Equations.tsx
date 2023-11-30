@@ -2,7 +2,7 @@
 
 import { MathField } from './MathField'
 import { ComputeEngine } from '@cortex-js/compute-engine'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FaIcon } from './FaIcon'
 import {
   faCircleCheck,
@@ -42,6 +42,10 @@ export function Equations() {
 
   const [solution, setSolution] = useState('')
 
+  const lastScrollPosition = useRef(-1)
+
+  const scrollDiv = useRef<HTMLDivElement>(null)
+
   const variableSymbol = Array.from(
     extractSymbols(safeParse(list[list.length - 1]).json).values()
   )[0]
@@ -73,6 +77,12 @@ export function Equations() {
 
   const [showOverview, setShowOverview] = useState(true)
 
+  useEffect(() => {
+    if (showOverview && lastScrollPosition.current > 0) {
+      window.document.documentElement.scrollTop = lastScrollPosition.current
+    }
+  }, [showOverview])
+
   if (showOverview) {
     return (
       <div className="flex flex-col">
@@ -95,7 +105,7 @@ export function Equations() {
             </button>
           </div>
         </div>
-        <div className="grow shrink overflow-auto">
+        <div className="grow shrink overflow-auto" ref={scrollDiv}>
           <div className="mx-auto max-w-[600px] mt-7 px-4 mb-[500px] [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mt-8">
             <h3>Serlo 26258 - Aufgaben zu linearen Gleichungen</h3>
             {renderExample('x+1=4')}
@@ -117,11 +127,48 @@ export function Equations() {
             <h3>Studyflix - einfache Gleichungen</h3>
             {renderExample('5=2+3')}
             {renderExample('6=2+3')}
-            {renderExample('TODO')}
-            {renderExample('TODO')}
-            {renderExample('TODO')}
-            {renderExample('TODO')}
-            {renderExample('TODO')}
+            {renderExample('x+4=6')}
+            {renderExample('x-2=8')}
+            {renderExample('5y+3=18')}
+            {renderExample('4(x+1)+3=7x-5')}
+            {renderExample('3x-1=8')}
+            {renderExample('2x-1=4x+3')}
+            {renderExample('3x+5=14')}
+            {renderExample('\\frac{x+5}{8}=2-2x')}
+            {renderExample('x+5=8')}
+            {renderExample('x-x=0')}
+            {renderExample('x=x+1')}
+            <h3>Lernkompass - S-Blatt01-lineare-Gleichungen</h3>
+            {renderExample('3x=21')}
+            {renderExample('-6x=48')}
+            {renderExample('12x=-60')}
+            {renderExample('7x=63')}
+            {renderExample('-8x=-56')}
+            {renderExample('10x=36')}
+            {renderExample('x+3=-12')}
+            {renderExample('x-7=25')}
+            {renderExample('x+4=16')}
+            {renderExample('5-x=17')}
+            {renderExample('13=3+x')}
+            {renderExample('12-x=27')}
+
+            {renderExample('21-2x=6x+5')}
+            {renderExample('15-5x=2x-20')}
+            {renderExample('9x+14=2+5x')}
+            {renderExample('3x+7=11+19x')}
+            {renderExample('41-3x=9+5x')}
+            {renderExample('17x-21=6x+45')}
+            {renderExample('x-3=5x-11')}
+            {renderExample('-44-12x=-5x+12')}
+
+            {renderExample('\\frac13 x = 9')}
+            {renderExample('\\frac25 x = 10')}
+            {renderExample('-2x = \\frac27')}
+            {renderExample('5x=- \\frac{10}{35}')}
+            {renderExample('-2{,}5x + 5{,}75 = 7{,}5x+1{,}75')}
+            {renderExample('8{,}3-1{,}2x=4{,}7+1{,}8x')}
+            {renderExample('\\frac23 x + \\frac12 = \\frac32 x + \\frac56')}
+            {renderExample('\\frac34x-\\frac25 = \\frac13+\\frac45 x')}
           </div>
         </div>
       </div>
@@ -153,6 +200,8 @@ export function Equations() {
                 setInputState('empty')
                 setActions([])
                 setSolution('')
+                lastScrollPosition.current =
+                  window.document.scrollingElement?.scrollTop ?? -1
               }}
             >
               erneut starten
@@ -167,6 +216,8 @@ export function Equations() {
                 setInputState('empty')
                 setActions([])
                 setSolution('')
+                lastScrollPosition.current =
+                  window.document.scrollingElement?.scrollTop ?? -1
               }}
             >
               <FaIcon icon={faPlay} className="text-sm mr-2" />
@@ -408,6 +459,7 @@ export function Equations() {
                               if (
                                 (!symbols.has(variableSymbol) &&
                                   symbols.size > 0) ||
+                                (variableSymbol && symbols.size == 0) ||
                                 symbols.size > 1
                               ) {
                                 setInputState('var-mismatch')
