@@ -18,7 +18,7 @@ export function MathField(props: MathFieldProps) {
       mf.current.menuItems = []
       if (props.readonly) {
         mf.current.readOnly = true
-        mf.current.registers.arraystretch = 1.3
+        mf.current.registers.arraystretch = 1.4
       } else {
         // only run on mount
         // Read more about customizing the mathfield: https://cortexjs.io/mathlive/guides/customizing/

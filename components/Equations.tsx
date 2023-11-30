@@ -107,10 +107,7 @@ export function Equations() {
             {renderExample('-8x + 5 = -5')}
             {renderExample('x + 4 = 9x - (5 - x)')}
             {renderExample('\\frac{1}{24} x = 0')}
-            {renderExample(
-              '3(a-4)=1-\\frac15(2-a)',
-              'Vereinfachung wird nicht erkannt'
-            )}
+            {renderExample('3(a-4)=1-\\frac15(2-a)')}
             {renderExample('3(4x-3)=4(3x-4)')}
             {renderExample('3(4x+4)=4(3-4x)', 'Fehlende Optionen am Schluss')}
           </div>
@@ -176,11 +173,7 @@ export function Equations() {
         actions.length > i
           ? actions[i].type == 'simplify'
             ? '&& \\Leftrightarrow'
-            : actions[i].latex.startsWith(':')
-            ? `&& \\vert ${actions[i].latex}`
-            : !actions[i].latex.startsWith('-')
-            ? `&& \\vert + ${actions[i].latex}`
-            : `&& \\vert ${actions[i].latex}`
+            : `&& \\vert ${actions[i].displayLatex}`
           : mode == 'done'
           ? '&& '
           : '&& \\vert \\hspace{0.2cm} \\boxed{\\textcolor{orange}{?}}'
@@ -304,7 +297,7 @@ export function Equations() {
                           </button>
                         )
                       }
-                      if (op.type == 'equiv-append') {
+                      if (op.type == 'equiv-add' || op.type == 'equiv-raw') {
                         return (
                           <button
                             className="ml-4 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded relative text-2xl"
@@ -313,12 +306,7 @@ export function Equations() {
                             <MathField
                               key={op.latex}
                               readonly
-                              value={
-                                op.latex.startsWith('-') ||
-                                op.latex.startsWith(':')
-                                  ? op.latex
-                                  : `+ ${op.latex}`
-                              }
+                              value={op.displayLatex ?? op.latex}
                             />
                             <span
                               className="absolute inset-0 opacity-0"
@@ -326,6 +314,7 @@ export function Equations() {
                                 setActions((acs) => [...acs, op])
                                 setMode('input')
                                 setInputState('empty')
+                                // console.log('debug', JSON.stringify(list))
                                 const parts = list[list.length - 1].split('=')
                                 setRefLeft(combineRef(parts[0], op))
                                 setRefRight(combineRef(parts[1], op))
@@ -341,9 +330,9 @@ export function Equations() {
                             key={i}
                           >
                             <MathField
-                              key={op.latex}
+                              key={op.displayLatex}
                               readonly
-                              value={op.latex}
+                              value={op.displayLatex}
                             />
                             <span
                               className="absolute inset-0 opacity-0"
@@ -355,7 +344,7 @@ export function Equations() {
                                 setRefLeft(combineRef(parts[0], op))
                                 setRefRight(combineRef(parts[1], op))*/
                                 setMode('done')
-                                setSolution(op.latex)
+                                setSolution(op.displayLatex!)
                                 solved.current.add(list[0])
                               }}
                             ></span>
@@ -388,66 +377,70 @@ export function Equations() {
                     <div className="border-2 rounded ml-2">
                       <MathField2
                         onChange={(latex) => {
-                          try {
-                            if (!latex) {
-                              setInputState('empty')
-                              return
-                            }
-                            const parsed = safeParse(latex)
-
-                            if (!parsed.isValid) {
-                              setInputState('error')
-                              return
-                            }
-
-                            const symbols = extractSymbols(parsed.json)
-
-                            // console.log(symbols, variableSymbol)
-                            if (
-                              (!symbols.has(variableSymbol) &&
-                                symbols.size > 0) ||
-                              symbols.size > 1
-                            ) {
-                              setInputState('var-mismatch')
-                              return
-                            }
-
-                            const parts = latex.split('=')
-
-                            if (parts.length < 2) {
-                              setInputState('error')
-                              return
-                            }
-
-                            // TODO!! check if results are fine
-                            for (let i = -4; i <= 4; i++) {
-                              ce.forget(variableSymbol)
-                              ce.assign(variableSymbol, i)
-
-                              if (
-                                safeParse(
-                                  `( ${refLeft} ) - ( ${parts[0]} )`
-                                ).N().isNotZero
-                              ) {
-                                setInputState('left-mismatch')
+                          setTimeout(() => {
+                            try {
+                              if (!latex) {
+                                setInputState('empty')
                                 return
                               }
-                              if (
-                                safeParse(
-                                  `( ${refRight} ) - ( ${parts[1]} )`
-                                ).N().isNotZero
-                              ) {
-                                setInputState('right-mismatch')
+                              const parsed = safeParse(latex)
+
+                              if (!parsed.isValid) {
+                                setInputState('error')
                                 return
                               }
-                            }
 
-                            currentLatex.current = latex
-                            setInputState('ok')
-                          } catch (e) {
-                            setMode('input')
-                            setInputState('error')
-                          }
+                              const symbols = extractSymbols(parsed.json)
+
+                              // console.log(symbols, variableSymbol)
+                              if (
+                                (!symbols.has(variableSymbol) &&
+                                  symbols.size > 0) ||
+                                symbols.size > 1
+                              ) {
+                                setInputState('var-mismatch')
+                                return
+                              }
+
+                              const parts = latex.split('=')
+
+                              if (parts.length < 2) {
+                                setInputState('error')
+                                return
+                              }
+
+                              // TODO!! check if results are fine
+                              for (let i = -4; i <= 4; i++) {
+                                ce.forget(variableSymbol)
+                                ce.assign(variableSymbol, i)
+
+                                const termL = `( ${refLeft} ) - ( ${parts[0]} )`
+                                const valueL = safeParse(termL).N()
+                                  .value as number
+
+                                const termR = `( ${refRight} ) - ( ${parts[1]} )`
+                                const valueR = safeParse(termR).N()
+                                  .value as number
+
+                                console.log(termL, valueL, '\n', termR, valueR)
+
+                                if (Math.abs(valueL) > 0.00001) {
+                                  setInputState('left-mismatch')
+                                  return
+                                }
+                                if (Math.abs(valueR) > 0.00001) {
+                                  setInputState('right-mismatch')
+                                  return
+                                }
+                              }
+
+                              currentLatex.current = latex
+                              setInputState('ok')
+                            } catch (e) {
+                              setMode('input')
+                              setInputState('error')
+                            }
+                          }, 0)
                         }}
                         onEnter={() => {
                           if (inputState == 'ok') {
@@ -534,10 +527,13 @@ export function Equations() {
   }
 
   function combineRef(latex: string, op: Action): string {
-    if (op.latex.startsWith(':')) {
-      return `( ${latex} ) \\div ( ${op.latex.replace(':', '')} )`
+    if (op.type == 'equiv-raw') {
+      return `( ${latex} ) ${op.latex}`
     }
-    return `( ${latex} ) + ( ${op.latex} )`
+    if (op.type == 'equiv-add') {
+      return `( ${latex} ) + ( ${op.latex} )`
+    }
+    return latex
   }
 
   function validateInput(json: Expression): true | string {
