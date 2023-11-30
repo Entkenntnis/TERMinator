@@ -1,4 +1,4 @@
-import { useState, useEffect, createRef } from 'react'
+import { useState, useEffect, createRef, useRef } from 'react'
 import MathfieldElement from '../types/mathlive/mathfield-element'
 
 interface MathFieldProps {
@@ -13,6 +13,9 @@ export function MathField2(props: MathFieldProps) {
 
   // Customize the mathfield when it is mounted
   const mf = createRef<MathfieldElement>()
+
+  const onEnter = useRef(props.onEnter)
+  onEnter.current = props.onEnter
   useEffect(() => {
     if (mf.current) {
       mf.current.menuItems = []
@@ -27,18 +30,36 @@ export function MathField2(props: MathFieldProps) {
           '*': '\\cdot',
         }
         mf.current.scriptDepth = 1
+
         mf.current.addEventListener('focusin', () => {
           window.mathVirtualKeyboard.show()
         })
         mf.current.addEventListener('focusout', () => {
           window.mathVirtualKeyboard.hide()
         })
+
+        const beforeInputHandler = (ev: InputEvent) => {
+          if (ev.inputType === 'insertLineBreak') {
+            if (onEnter.current) {
+              onEnter.current()
+            }
+          }
+        }
+
+        const mfc = mf.current
+
+        mfc.addEventListener('beforeinput', beforeInputHandler)
+
         mf.current.keybindings = [
           ...mf.current.keybindings,
           { key: ':', command: ['insert', '\\div'] },
           { key: '[NumpadDivide]', command: ['insert', '\\div'] },
         ]
         mf.current.focus()
+
+        return () => {
+          mfc.removeEventListener('beforeinput', beforeInputHandler)
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,11 +69,6 @@ export function MathField2(props: MathFieldProps) {
     <math-field
       style={{ display: 'block' }}
       ref={mf}
-      onKeyDownCapture={(ev) => {
-        if (ev.key == 'Enter' && props.onEnter) {
-          props.onEnter()
-        }
-      }}
       onInput={(evt) => {
         const v = (evt.target as MathfieldElement).value
         setValue(v)

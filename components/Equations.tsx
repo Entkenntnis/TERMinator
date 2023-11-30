@@ -9,6 +9,7 @@ import {
   faPlay,
   faRotateLeft,
 } from '@fortawesome/free-solid-svg-icons'
+import { faSquare } from '@fortawesome/free-regular-svg-icons'
 import { MathField2 } from './MathField2'
 import { Expression } from '../types/mathlive/mathfield-element'
 import { Action, findActions } from '../lib/equations'
@@ -88,25 +89,14 @@ export function Equations() {
       <div className="flex flex-col">
         <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
           <div className="flex items-baseline">
-            <h1 className="text-xl text-bold my-2 ml-3">Gleichungstool</h1>
+            <h1 className="text-xl text-bold my-2 ml-3">
+              Serlo Gleichungs-App
+            </h1>
           </div>
-          <div className="mr-3">
-            <a href="/" className="hover:underline">
-              zurück zu Algebra-Prototypen
-            </a>
-            <button
-              className="ml-8 hover:underline"
-              onClick={() => {
-                setShowOverview(false)
-                setEdit(true)
-              }}
-            >
-              eigene Aufgabe erstellen
-            </button>
-          </div>
+          <div className="mr-3"></div>
         </div>
         <div className="grow shrink overflow-auto" ref={scrollDiv}>
-          <div className="mx-auto max-w-[600px] mt-7 px-4 mb-[500px] [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mt-8">
+          <div className="mx-auto max-w-[600px] mt-7 px-4 mb-[200px] [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mt-8">
             <h3>Serlo 26258 - Aufgaben zu linearen Gleichungen</h3>
             {renderExample('x+1=4')}
             {renderExample('2x=8')}
@@ -177,6 +167,19 @@ export function Equations() {
             {renderExample('10-(7x-5)=2-2(x+6)')}
             {renderExample('12-(-3x+6)=18-(9+3x)')}
             {renderExample('2-7(2x+5)-3(2x-4)=19')}
+
+            <div className="text-center">
+              {' '}
+              <button
+                className="mt-12 ml-3 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                onClick={() => {
+                  setShowOverview(false)
+                  setEdit(true)
+                }}
+              >
+                eigene Aufgabe erstellen
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -186,9 +189,9 @@ export function Equations() {
   function renderExample(latex: string, warning?: string) {
     const isSolved = solved.current.has(latex)
     return (
-      <div className="my-4 flex items-baseline justify-between">
+      <div className="my-4 flex items-baseline justify-between h-14">
         <div className="text-2xl flex items-baseline">
-          <MathField readonly key={latex} value={latex} />
+          <MathField readonly key={latex} value={latex} lazy />
           {isSolved && (
             <FaIcon
               icon={faCircleCheck}
@@ -210,6 +213,8 @@ export function Equations() {
                 setSolution('')
                 lastScrollPosition.current =
                   window.document.scrollingElement?.scrollTop ?? -1
+
+                window.scrollTo(0, 0)
               }}
             >
               erneut starten
@@ -226,6 +231,8 @@ export function Equations() {
                 setSolution('')
                 lastScrollPosition.current =
                   window.document.scrollingElement?.scrollTop ?? -1
+
+                window.scrollTo(0, 0)
               }}
             >
               <FaIcon icon={faPlay} className="text-sm mr-2" />
@@ -247,7 +254,7 @@ export function Equations() {
             : `&& \\vert ${actions[i].displayLatex}`
           : mode == 'done'
           ? '&& '
-          : '&& \\vert \\hspace{0.2cm} \\boxed{\\textcolor{orange}{?}}'
+          : '&& \\hspace{0.2cm} \\boxed{\\textcolor{orange}{?}}'
       }`
     })
     .join('\\\\\n')}\\end{align}`
@@ -256,7 +263,7 @@ export function Equations() {
     <div className="flex flex-col">
       <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
         <div className="flex items-baseline">
-          <h1 className="text-xl text-bold my-2 ml-3">Gleichungstool</h1>
+          <h1 className="text-xl text-bold my-2 ml-3">Serlo Gleichungs-App</h1>
         </div>
         <div className="mr-3">
           {edit ? (
@@ -275,6 +282,7 @@ export function Equations() {
                 onClick={() => {
                   setEdit(false)
                   setMode('choose')
+                  setActions([])
                 }}
               >
                 Aufgabe testen
@@ -288,7 +296,7 @@ export function Equations() {
                 window.mathVirtualKeyboard.hide()
               }}
             >
-              Aufgabe schließen
+              zurück
             </button>
           )}
         </div>
@@ -347,13 +355,15 @@ export function Equations() {
               </div>
               {mode == 'choose' && (
                 <div>
-                  <p className="border-t-2 pt-4 mt-6"></p>
-                  <div className="mt-4 flex justify-around flex-wrap">
+                  <p className="border-t-2 pt-4 mt-6 text-gray-700 font-bold">
+                    Klicke auf eine der Optionen:
+                  </p>
+                  <div className="mt-4 flex justify-start flex-wrap">
                     {options.map((op, i) => {
                       if (op.type == 'simplify') {
                         return (
                           <button
-                            className="ml-4 px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                            className="ml-4 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded mt-3"
                             key={i}
                             onClick={() => {
                               setActions((acs) => [...acs, op])
@@ -371,13 +381,13 @@ export function Equations() {
                       if (op.type == 'equiv-add' || op.type == 'equiv-raw') {
                         return (
                           <button
-                            className="ml-4 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded relative text-2xl"
+                            className="ml-4 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-2xl mt-3"
                             key={i}
                           >
                             <MathField
                               key={op.latex}
                               readonly
-                              value={op.displayLatex ?? op.latex}
+                              value={`\\vert ${op.displayLatex ?? op.latex}`}
                             />
                             <span
                               className="absolute inset-0 opacity-0"
@@ -397,7 +407,7 @@ export function Equations() {
                       if (op.type == 'solution') {
                         return (
                           <button
-                            className="ml-4 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded relative text-2xl"
+                            className="ml-4 px-2 py-1 bg-green-200 hover:bg-green-300 rounded relative text-2xl mt-3"
                             key={i}
                           >
                             <MathField
@@ -467,7 +477,7 @@ export function Equations() {
                               if (
                                 (!symbols.has(variableSymbol) &&
                                   symbols.size > 0) ||
-                                (variableSymbol && symbols.size == 0) ||
+                                // (variableSymbol && symbols.size == 0) ||
                                 symbols.size > 1
                               ) {
                                 setInputState('var-mismatch')
@@ -506,7 +516,7 @@ export function Equations() {
                                   setInputState('right-mismatch')
                                   return
                                 }
-                                if (symbols.size == 0) break
+                                //if (symbols.size == 0) break
                               }
 
                               currentLatex.current = latex
@@ -519,6 +529,7 @@ export function Equations() {
                           }, 0)
                         }}
                         onEnter={() => {
+                          console.log('hi', inputState)
                           if (inputState == 'ok') {
                             setList((list) => [...list, currentLatex.current])
                             setMode('choose')
@@ -527,7 +538,20 @@ export function Equations() {
                       />
                     </div>
                     <div className="text-base ml-3 mt-2">
-                      {inputState == 'empty' && <span>Warte auf Eingabe</span>}
+                      {inputState == 'empty' && (
+                        <span>
+                          Führe die Umformung durch. Erwarte Eingabe der Form{' '}
+                          <FaIcon
+                            icon={faSquare}
+                            className="text-sm text-blue-400"
+                          />{' '}
+                          ={' '}
+                          <FaIcon
+                            icon={faSquare}
+                            className="text-sm text-blue-400"
+                          />
+                        </span>
+                      )}
                       {inputState == 'error' && (
                         <span>Fehler bei der Eingabe</span>
                       )}

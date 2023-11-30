@@ -1,19 +1,31 @@
 import { useState, useEffect, createRef } from 'react'
 import MathfieldElement from '../types/mathlive/mathfield-element'
+import { FaIcon } from './FaIcon'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 interface MathFieldProps {
   value?: string
   readonly?: boolean
   onChange?: (latex: string) => void
   onEnter?: () => void
+  lazy?: boolean
 }
 
 export function MathField(props: MathFieldProps) {
   const [value, setValue] = useState(props.value ?? '')
 
+  const [wait, setWait] = useState(!!props.lazy)
+
   // Customize the mathfield when it is mounted
   const mf = createRef<MathfieldElement>()
+
   useEffect(() => {
+    if (wait) {
+      setTimeout(() => {
+        setWait(false)
+      }, 100)
+      return
+    }
     if (mf.current) {
       mf.current.menuItems = []
       if (props.readonly) {
@@ -65,12 +77,19 @@ export function MathField(props: MathFieldProps) {
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [mf.current, wait])
+
+  if (wait) {
+    return (
+      <div>
+        <FaIcon icon={faSpinner} className="animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <math-field
-      style={{ display: 'block' }}
+      style={{ display: 'block', backgroundColor: 'rgba(255,255,255,0)' }}
       ref={mf}
       onKeyDownCapture={(ev) => {
         if (ev.key == 'Enter' && props.onEnter) {

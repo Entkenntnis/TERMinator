@@ -168,9 +168,11 @@ export function findActions(
           })
         }
       }
-      output.push({ type: 'simplify', latex: '' })
-      forInput(input[1])
-      forInput(input[2])
+      if (output.length == 0) {
+        output.push({ type: 'simplify', latex: '' })
+        forInput(input[1])
+        forInput(input[2])
+      }
       const existingOps = new Set<string>()
       return output
         .map((op) => {
