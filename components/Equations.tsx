@@ -96,8 +96,8 @@ export function Equations() {
           </div>
         </div>
         <div className="grow shrink overflow-auto">
-          <div className="mx-auto max-w-[600px] mt-7 px-4 mb-[500px] [&>h3]:text-lg [&>h3]:font-bold">
-            <h3>Serlo 26258: Aufgaben zu linearen Gleichungen</h3>
+          <div className="mx-auto max-w-[600px] mt-7 px-4 mb-[500px] [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mt-8">
+            <h3>Serlo 26258 - Aufgaben zu linearen Gleichungen</h3>
             {renderExample('x+1=4')}
             {renderExample('2x=8')}
             {renderExample('4x=3x+5')}
@@ -114,6 +114,14 @@ export function Equations() {
             {renderExample('3(a-4)=1-\\frac15(2-a)', 'HN Multiplikation?')}
             {renderExample('3(4x-3)=4(3x-4)')}
             {renderExample('3(4x+4)=4(3-4x)')}
+            <h3>Studyflix - einfache Gleichungen</h3>
+            {renderExample('5=2+3')}
+            {renderExample('6=2+3')}
+            {renderExample('TODO')}
+            {renderExample('TODO')}
+            {renderExample('TODO')}
+            {renderExample('TODO')}
+            {renderExample('TODO')}
           </div>
         </div>
       </div>
@@ -415,8 +423,10 @@ export function Equations() {
 
                               // TODO!! check if results are fine
                               for (let i = -4; i <= 4; i++) {
-                                ce.forget(variableSymbol)
-                                ce.assign(variableSymbol, i)
+                                if (symbols.size > 0) {
+                                  ce.forget(variableSymbol)
+                                  ce.assign(variableSymbol, i)
+                                }
 
                                 const termL = `( ${refLeft} ) - ( ${parts[0]} )`
                                 const valueL = safeParse(termL).N()
@@ -436,11 +446,13 @@ export function Equations() {
                                   setInputState('right-mismatch')
                                   return
                                 }
+                                if (symbols.size == 0) break
                               }
 
                               currentLatex.current = latex
                               setInputState('ok')
                             } catch (e) {
+                              console.log(e)
                               setMode('input')
                               setInputState('error')
                             }
