@@ -102,6 +102,11 @@ export function Equations() {
         <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
           <div className="flex items-baseline">
             <h1 className="text-xl text-bold my-2 ml-3">
+              <img
+                src="/favicon.ico"
+                className="inline-block h-6 mr-3 -mt-1"
+                alt=""
+              />
               Serlo Gleichungs-App
             </h1>
           </div>
@@ -123,7 +128,7 @@ export function Equations() {
             {renderExample('-8x + 5 = -5')}
             {renderExample('x + 4 = 9x - (5 - x)')}
             {renderExample('\\frac{1}{24} x = 0')}
-            {renderExample('3(a-4)=1-\\frac15(2-a)', 'HN Multiplikation?')}
+            {renderExample('3(a-4)=1-\\frac15(2-a)' /*, 'HN Multiplikation?'*/)}
             {renderExample('3(4x-3)=4(3x-4)')}
             {renderExample('3(4x+4)=4(3-4x)')}
             <h3>Studyflix - einfache Gleichungen</h3>
@@ -281,7 +286,14 @@ export function Equations() {
     <div className="flex flex-col">
       <div className="grow-0 bg-gray-100 flex justify-between items-baseline pb-1">
         <div className="flex items-baseline">
-          <h1 className="text-xl text-bold my-2 ml-3">Serlo Gleichungs-App</h1>
+          <h1 className="text-xl text-bold my-2 ml-3">
+            <img
+              src="/favicon.ico"
+              className="inline-block h-6 mr-3 -mt-1"
+              alt=""
+            />
+            Serlo Gleichungs-App
+          </h1>
         </div>
         <div className="mr-3">
           {edit ? (
@@ -384,7 +396,7 @@ export function Equations() {
                       if (op.type == 'simplify') {
                         return (
                           <button
-                            className="ml-6 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded mt-3"
+                            className="mr-6 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded mt-3"
                             key={i}
                             onClick={() => {
                               setActions((acs) => [...acs, op])
@@ -402,7 +414,7 @@ export function Equations() {
                       if (op.type == 'equiv-add' || op.type == 'equiv-raw') {
                         return (
                           <button
-                            className="ml-6 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-2xl mt-3"
+                            className="mr-6 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-2xl mt-3"
                             key={i}
                           >
                             <MathField
@@ -428,7 +440,7 @@ export function Equations() {
                       if (op.type == 'solution') {
                         return (
                           <button
-                            className="ml-6 px-2 py-1 bg-green-200 hover:bg-green-300 rounded relative text-2xl mt-3"
+                            className="mr-6 px-2 py-1 bg-green-200 hover:bg-green-300 rounded relative text-2xl mt-3"
                             key={i}
                           >
                             <MathField
@@ -624,16 +636,18 @@ export function Equations() {
                       />{' '}
                       Stark!
                     </div>
-                  </div>{' '}
-                  <button
-                    className="px-2 py-1 rounded bg-blue-200 hover:bg-blue-300 mt-6"
-                    onClick={() => {
-                      setShowOverview(true)
-                      window.mathVirtualKeyboard.hide()
-                    }}
-                  >
-                    weiter
-                  </button>
+                  </div>
+                  <div className="text-center">
+                    <button
+                      className="px-5 py-2 rounded bg-blue-200 hover:bg-blue-300 mt-6 mx-auto "
+                      onClick={() => {
+                        setShowOverview(true)
+                        window.mathVirtualKeyboard.hide()
+                      }}
+                    >
+                      weiter
+                    </button>
+                  </div>
                 </>
               )}
             </>
