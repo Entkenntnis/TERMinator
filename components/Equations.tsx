@@ -397,7 +397,7 @@ export function Equations() {
                       if (op.type == 'simplify') {
                         return (
                           <button
-                            className="mr-6 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded mt-3"
+                            className="mr-6 px-3 py-1 bg-gray-50 hover:bg-gray-100 rounded mt-3 border"
                             key={i}
                             onClick={() => {
                               setActions((acs) => [...acs, op])
@@ -415,7 +415,7 @@ export function Equations() {
                       if (op.type == 'equiv-add' || op.type == 'equiv-raw') {
                         return (
                           <button
-                            className="mr-6 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-xl mt-3"
+                            className="mr-6 px-2 py-1 bg-gray-50 hover:bg-gray-100 rounded relative text-xl mt-3 border"
                             key={i}
                           >
                             <MathField
