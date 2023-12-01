@@ -274,11 +274,11 @@ export function Equations() {
       return `${parts[0]} &= ${parts[1]} && ${
         actions.length > i
           ? actions[i].type == 'simplify'
-            ? '&& \\Leftrightarrow'
-            : `&& \\vert ${actions[i].displayLatex}`
+            ? ' \\Leftrightarrow'
+            : ` \\vert ${actions[i].displayLatex}`
           : mode == 'done'
-          ? '&& '
-          : '&& \\boxed{\\textcolor{orange}{?}}'
+          ? ' '
+          : ' \\boxed{\\textcolor{orange}{?}}'
       }`
     })
     .join('\\\\\n')}\\end{align}`
