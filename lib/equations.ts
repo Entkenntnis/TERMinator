@@ -19,6 +19,7 @@ export function findActions(
 
   function negateAndShowOp(t: any) {
     if (typeof t == 'number' && t == 0) return
+    // komplexere Terme ausschließen?
     const rawLatex = ce
       .box(['Negate', t])
       .latex.replaceAll('\\frac{-', '-\\frac{')

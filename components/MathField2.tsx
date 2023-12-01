@@ -55,7 +55,7 @@ export function MathField2(props: MathFieldProps) {
           { key: ':', command: ['insert', '\\div'] },
           { key: '[NumpadDivide]', command: ['insert', '\\div'] },
         ]
-        mf.current.focus()
+        //mf.current.focus()
 
         return () => {
           mfc.removeEventListener('beforeinput', beforeInputHandler)

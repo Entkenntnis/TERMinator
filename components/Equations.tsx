@@ -13,6 +13,7 @@ import { faSquare } from '@fortawesome/free-regular-svg-icons'
 import { MathField2 } from './MathField2'
 import { Expression } from '../types/mathlive/mathfield-element'
 import { Action, findActions } from '../lib/equations'
+import confetti from 'canvas-confetti'
 
 type Mode = 'done' | 'input' | 'choose'
 type InputState =
@@ -209,7 +210,7 @@ export function Equations() {
     const isSolved = solved.current.has(latex)
     return (
       <div className="my-4 flex items-baseline justify-between h-14">
-        <div className="text-2xl flex items-baseline">
+        <div className="text-xl flex items-baseline">
           <MathField readonly key={latex} value={latex} lazy />
           {isSolved && (
             <FaIcon
@@ -347,7 +348,7 @@ export function Equations() {
                   defaultValue={description}
                 ></textarea>
               </p>
-              <div className="text-2xl border-2 rounded">
+              <div className="text-xl border-2 rounded">
                 <MathField2
                   value={list[0]}
                   onChange={(latex) => {
@@ -383,12 +384,12 @@ export function Equations() {
             <>
               <p className="mb-3 mt-8 mb-7">{description}</p>
 
-              <div className="text-2xl">
+              <div className="text-xl">
                 <MathField readonly key={output} value={output} />
               </div>
               {mode == 'choose' && (
                 <div>
-                  <p className="border-t-2 pt-4 mt-6 text-gray-700 font-bold">
+                  <p className="border-t-2 pt-4 mt-6 text-gray-700 font-bold text-base">
                     Klicke auf eine der Optionen:
                   </p>
                   <div className="mt-4 flex justify-start flex-wrap">
@@ -414,7 +415,7 @@ export function Equations() {
                       if (op.type == 'equiv-add' || op.type == 'equiv-raw') {
                         return (
                           <button
-                            className="mr-6 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-2xl mt-3"
+                            className="mr-6 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded relative text-xl mt-3"
                             key={i}
                           >
                             <MathField
@@ -440,7 +441,7 @@ export function Equations() {
                       if (op.type == 'solution') {
                         return (
                           <button
-                            className="mr-6 px-2 py-1 bg-green-200 hover:bg-green-300 rounded relative text-2xl mt-3"
+                            className="mr-6 px-2 py-1 bg-green-200 hover:bg-green-300 rounded relative text-xl mt-3"
                             key={i}
                           >
                             <MathField
@@ -457,6 +458,7 @@ export function Equations() {
                                 const parts = list[list.length - 1].split('=')
                                 setRefLeft(combineRef(parts[0], op))
                                 setRefRight(combineRef(parts[1], op))*/
+                                confetti()
                                 setMode('done')
                                 setSolution(op.displayLatex!)
                                 solved.current.add(list[0])
@@ -471,11 +473,11 @@ export function Equations() {
               )}
 
               {mode == 'input' && (
-                <div className="text-2xl flex items-baseline mt-3">
+                <div className="text-xl flex items-baseline mt-3">
                   <div className="grow">
                     <div className="text-right">
                       <button
-                        className="text-sm text-gray-600 hover:text-black mb-2"
+                        className="text-sm text-gray-600 hover:text-black mb-1"
                         onClick={() => {
                           setActions((acc) => acc.slice(0, -1))
                           setMode('choose')
@@ -484,11 +486,13 @@ export function Equations() {
                           }
                         }}
                       >
-                        <FaIcon icon={faRotateLeft} /> letzte Auswahl rückgängig
-                        machen
+                        <FaIcon icon={faRotateLeft} /> Auswahl rückgängig machen
                       </button>
                     </div>
-                    <div className="border-2 rounded ml-2">
+                    <div className="border-t-2 pt-4 text-gray-700 font-bold text-base mb-4">
+                      Forme die Gleichung um:
+                    </div>
+                    <div className="border-2 rounded">
                       <MathField2
                         onChange={(latex) => {
                           setTimeout(() => {
@@ -563,23 +567,23 @@ export function Equations() {
                           }, 0)
                         }}
                         onEnter={() => {
-                          console.log('hi', inputState)
                           if (inputState == 'ok') {
                             setList((list) => [...list, currentLatex.current])
                             setMode('choose')
+                            window.mathVirtualKeyboard.hide()
                           }
                         }}
                       />
                     </div>
-                    <div className="text-base ml-3 mt-2">
+                    <div className="text-base ml-1 mt-2">
                       {inputState == 'empty' && (
                         <span>
-                          Führe die Umformung durch. Erwarte Eingabe der Form{' '}
+                          Erwarte Eingabe der Form{' '}
                           <FaIcon
                             icon={faSquare}
                             className="text-sm text-blue-400"
-                          />{' '}
-                          ={' '}
+                          />
+                          &nbsp; =&nbsp;
                           <FaIcon
                             icon={faSquare}
                             className="text-sm text-blue-400"
@@ -625,8 +629,8 @@ export function Equations() {
               )}
               {mode == 'done' && (
                 <>
-                  <div className="flex justify-start items-baseline">
-                    <div className="text-2xl mt-6">
+                  <div className="flex justify-start items-baseline mt-2">
+                    <div className="text-xl">
                       <MathField readonly key={solution} value={solution} />
                     </div>
                     <div className="text-green-500 ml-8">
