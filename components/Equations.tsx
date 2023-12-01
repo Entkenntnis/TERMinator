@@ -13,7 +13,7 @@ import { faSquare } from '@fortawesome/free-regular-svg-icons'
 import { MathField2 } from './MathField2'
 import { Expression } from '../types/mathlive/mathfield-element'
 import { Action, findActions } from '../lib/equations'
-import confetti from 'canvas-confetti'
+import confetti from 'canvas-confetti' // why is this throwing warnings? sigh ..
 
 type Mode = 'done' | 'input' | 'choose'
 type InputState =
@@ -389,7 +389,7 @@ export function Equations() {
               </div>
               {mode == 'choose' && (
                 <div>
-                  <p className="border-t-2 pt-4 mt-6 text-gray-700 font-bold text-base">
+                  <p className="mt-6 text-gray-700 font-bold text-base">
                     Klicke auf eine der Optionen:
                   </p>
                   <div className="mt-4 flex justify-start flex-wrap">
@@ -458,7 +458,7 @@ export function Equations() {
                                 const parts = list[list.length - 1].split('=')
                                 setRefLeft(combineRef(parts[0], op))
                                 setRefRight(combineRef(parts[1], op))*/
-                                confetti()
+                                confetti.default()
                                 setMode('done')
                                 setSolution(op.displayLatex!)
                                 solved.current.add(list[0])
@@ -475,9 +475,14 @@ export function Equations() {
               {mode == 'input' && (
                 <div className="text-xl flex items-baseline mt-3">
                   <div className="grow">
-                    <div className="text-right">
+                    <div className="flex justify-between items-baseline mb-2">
+                      <div className="pt-3 text-gray-700 font-bold text-base ">
+                        {actions[actions.length - 1].type == 'simplify'
+                          ? 'Terme in Gleichung vereinfachen:'
+                          : 'Umformen:'}
+                      </div>
                       <button
-                        className="text-sm text-gray-600 hover:text-black mb-1"
+                        className="text-sm text-gray-600 hover:text-black"
                         onClick={() => {
                           setActions((acc) => acc.slice(0, -1))
                           setMode('choose')
@@ -486,11 +491,14 @@ export function Equations() {
                           }
                         }}
                       >
-                        <FaIcon icon={faRotateLeft} /> Auswahl rückgängig machen
+                        <FaIcon
+                          icon={faRotateLeft}
+                          className="text-base sm:text-xs"
+                        />
+                        <span className="hidden sm:inline">
+                          &nbsp;rückgängig
+                        </span>
                       </button>
-                    </div>
-                    <div className="border-t-2 pt-4 text-gray-700 font-bold text-base mb-4">
-                      Forme die Gleichung um:
                     </div>
                     <div className="border-2 rounded">
                       <MathField2
@@ -583,7 +591,7 @@ export function Equations() {
                             icon={faSquare}
                             className="text-sm text-blue-400"
                           />
-                          &nbsp; =&nbsp;
+                          &nbsp;=&nbsp;
                           <FaIcon
                             icon={faSquare}
                             className="text-sm text-blue-400"
