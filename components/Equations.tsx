@@ -458,7 +458,7 @@ export function Equations() {
                                 const parts = list[list.length - 1].split('=')
                                 setRefLeft(combineRef(parts[0], op))
                                 setRefRight(combineRef(parts[1], op))*/
-                                confetti.default()
+                                confetti()
                                 setMode('done')
                                 setSolution(op.displayLatex!)
                                 solved.current.add(list[0])
