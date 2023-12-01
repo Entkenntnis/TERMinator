@@ -13,7 +13,7 @@ import { faSquare } from '@fortawesome/free-regular-svg-icons'
 import { MathField2 } from './MathField2'
 import { Expression } from '../types/mathlive/mathfield-element'
 import { Action, findActions } from '../lib/equations'
-import confetti from 'canvas-confetti' // why is this throwing warnings? sigh ..
+import * as confetti from 'canvas-confetti' // why is this throwing warnings? sigh ..
 
 type Mode = 'done' | 'input' | 'choose'
 type InputState =
@@ -30,7 +30,11 @@ export function Equations() {
   function safeParse(latex: string) {
     return ce.parse(latex.replaceAll('{,}', '.'))
   }
-  window.MathfieldElement.decimalSeparator = ','
+  try {
+    window.MathfieldElement.decimalSeparator = ','
+  } catch (e) {
+    //
+  }
   const [description, setDescription] = useState(
     'Löse die Gleichung und bestimme die Lösungsmenge.'
   )
@@ -458,7 +462,11 @@ export function Equations() {
                                 const parts = list[list.length - 1].split('=')
                                 setRefLeft(combineRef(parts[0], op))
                                 setRefRight(combineRef(parts[1], op))*/
-                                confetti()
+                                try {
+                                  confetti.default()
+                                } catch (e) {
+                                  // don't care
+                                }
                                 setMode('done')
                                 setSolution(op.displayLatex!)
                                 solved.current.add(list[0])
